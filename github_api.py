@@ -25,7 +25,7 @@ class DataHandler:
                 if path.name == "index.md":
                     pass
                 else:
-                    self.docs_dict.update({path.stem.lower(): item["sha"]})
+                    self.docs_dict.update({path.stem.lower(): [item["sha"], path.stem]})
 
         with open(self.local_file_path, 'w') as FILE:
             json.dump(self.docs_dict, FILE)
@@ -44,7 +44,7 @@ class DataHandler:
     def get_doc(self, target):
         if target not in self.docs_dict.keys():
             return ValueError("Specified Block not found")
-        url = self.github_sha_base_url.format(self.docs_dict[target])
+        url = self.github_sha_base_url.format(self.docs_dict[target][0])
         try:
             data = get(url).json()
             if data.get("message") == "Not Found":
@@ -59,21 +59,22 @@ class DataHandler:
 
 if __name__ == "__main__":
     DataHandler().update_data()
-    dh = DataHandler()
-    dh.load_data()
-    doc_list = [i for i in dh.get_doc("getplayerstate").split("\n") if i != ""]
-    content = ''
-    inputs = ''
-    output = ''
-    title = doc_list[0]
-    if "Inputs" in doc_list:
-        content = doc_list[1:doc_list.index("Inputs")]
-    else:
-        content = doc_list[1:]
-    if "Output" in doc_list:
-        inputs = doc_list[doc_list.index("Inputs")+1:doc_list.index("Output")]
-        output = doc_list[doc_list.index("Output") + 1:]
-    else:
-        inputs = doc_list[doc_list.index("Inputs") + 1:]
-
-    print(title, content, inputs, output)
+    # dh = DataHandler()
+    # dh.load_data()
+    # doc_list = [i for i in dh.get_doc("rule").split("\n") if i != ""]
+    # # content = ''
+    # # inputs = ''
+    # # output = ''
+    # # title = doc_list[0]
+    # # if "Inputs" in doc_list:
+    # #     content = doc_list[1:doc_list.index("Inputs")]
+    # # else:
+    # #     content = doc_list[1:]
+    # # if "Output" in doc_list:
+    # #     inputs = doc_list[doc_list.index("Inputs")+1:doc_list.index("Output")]
+    # #     output = doc_list[doc_list.index("Output") + 1:]
+    # # else:
+    # #     inputs = doc_list[doc_list.index("Inputs") + 1:]
+    # #
+    # # print(title, content, inputs, output)
+    # print(doc_list[0], doc_list[1], doc_list[3:])
