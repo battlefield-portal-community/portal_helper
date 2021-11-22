@@ -8,6 +8,8 @@ import logging
 
 load_dotenv()
 log_file = "log"
+logging.getLogger("discord").setLevel(logging.WARNING)
+logging.getLogger("discord_slash").setLevel(logging.WARNING)
 logging.basicConfig(filename=log_file,
                             filemode='a',
                             format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -80,7 +82,8 @@ def make_embed(block_name):
     else:
         content = doc_list[1:][0]
     if "Output" in doc_list:
-        inputs = doc_list[doc_list.index("Inputs")+1:doc_list.index("Output")]
+        if "Inputs" in doc_list:
+            inputs = doc_list[doc_list.index("Inputs")+1:doc_list.index("Output")]
         output = doc_list[doc_list.index("Output") + 1:]
     else:
         if "Inputs" in doc_list:
