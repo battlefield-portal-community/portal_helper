@@ -1,13 +1,13 @@
 import os
-from discord import ext,Embed
+from discord import ext, Embed, Color
 from discord_slash import SlashCommand # Importing the newly installed library.
 from thefuzz import fuzz, process
 from github_api import DataHandler
 from dotenv import load_dotenv
 import logging
+
 load_dotenv()
 log_file = "log"
-
 logging.basicConfig(filename=log_file,
                             filemode='a',
                             format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -59,8 +59,8 @@ def make_embed(block_name):
     block_name = str(block_name).lower()
     if block_name == "all":
         # todo: Show Complete list of all blocks
-        return
-#        return special_embeds("all")
+        raise NotImplementedError("command to get all blocks not implemented yet")
+        # return special_embeds("all")
     elif block_name == "rule":
         return special_embeds("rule")
     elif block_name in dh.docs_dict.keys():
@@ -137,16 +137,29 @@ async def on_ready():
     print("Ready!")
 
 
-@slash.slash(name="d", guild_ids=guild_ids, description="Returns Documentation of a block, type all to get all blocks")
+@slash.slash(name="d", description="Returns Documentation of a block")
 async def _d(ctx, block_name):
     try:
-        if block_name != "all":
-            embed = make_embed(block_name)
-            await ctx.send(embed=embed, delete_after=60*5)
-        else:
-            await ctx.send("Not yet Implemented", delete_after=60 * 5)
+        embed = make_embed(block_name)
+        await ctx.send(embed=embed, delete_after=60*5)
+    except NotImplementedError as e:
+        logging.warning(e)
+        await ctx.send(
+            embed=Embed(
+                title="Not Yet Implemented",
+                description=f"Command {block_name}",
+                colour=Color.red()
+            ),
+            delete_after=10
+        )
     except ValueError as e:
         logging.critical(e)
-        await ctx.send("```\nError getting doc```", delete_after=10)
+        await ctx.send(
+            embed=Embed(
+                title=f"Error getting docs for {block_name}",
+                description="\u200b",
+                colour=Color.red()
+            )
+        )
 
 bot.run(os.getenv("DISCORD_TOKEN"))
