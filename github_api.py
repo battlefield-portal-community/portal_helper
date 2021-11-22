@@ -61,7 +61,7 @@ if __name__ == "__main__":
     DataHandler().update_data()
     # dh = DataHandler()
     # dh.load_data()
-    # doc_list = [i for i in dh.get_doc("rule").split("\n") if i != ""]
+    # doc_list = [i for i in dh.get_doc("getplayerinput").split("\n") if i != ""]
     # # content = ''
     # # inputs = ''
     # # output = ''
