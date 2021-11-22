@@ -144,7 +144,7 @@ async def on_ready():
 async def _d(ctx, block_name):
     try:
         embed = make_embed(block_name)
-        await ctx.send(embed=embed, delete_after=60*5)
+        await ctx.send(embed=embed)
     except NotImplementedError as e:
         logging.warning(e)
         await ctx.send(
