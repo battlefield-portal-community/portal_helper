@@ -53,28 +53,26 @@ class DataHandler:
         except ValueError:
             raise
         html = BeautifulSoup(markdown(content), features="html.parser")
-        html.find("code").decompose()
+        for tag in html.find_all("code"):
+            tag.decompose()
         return html.text
 
 
 if __name__ == "__main__":
     DataHandler().update_data()
-    # dh = DataHandler()
-    # dh.load_data()
-    # doc_list = [i for i in dh.get_doc("getplayerinput").split("\n") if i != ""]
-    # # content = ''
-    # # inputs = ''
-    # # output = ''
-    # # title = doc_list[0]
-    # # if "Inputs" in doc_list:
-    # #     content = doc_list[1:doc_list.index("Inputs")]
-    # # else:
-    # #     content = doc_list[1:]
-    # # if "Output" in doc_list:
-    # #     inputs = doc_list[doc_list.index("Inputs")+1:doc_list.index("Output")]
-    # #     output = doc_list[doc_list.index("Output") + 1:]
-    # # else:
-    # #     inputs = doc_list[doc_list.index("Inputs") + 1:]
-    # #
-    # # print(title, content, inputs, output)
-    # print(doc_list[0], doc_list[1], doc_list[3:])
+#    # content = ''
+    # inputs = ''
+    # output = ''
+    # title = doc_list[0]
+    # if "Inputs" in doc_list:
+    #     content = doc_list[1:doc_list.index("Inputs")]
+    # else:
+    #     content = doc_list[1:]
+    # if "Output" in doc_list:
+    #     inputs = doc_list[doc_list.index("Inputs")+1:doc_list.index("Output")]
+    #     output = doc_list[doc_list.index("Output") + 1:]
+    # else:
+    #     inputs = doc_list[doc_list.index("Inputs") + 1:]
+    #
+    # print(title, content, inputs, output)
+    #print(doc_list)
