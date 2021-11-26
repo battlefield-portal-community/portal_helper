@@ -158,20 +158,12 @@ async def _tools(ctx):
         inline=False
     )
     embed.add_field(
-        name="\u200B",
-        value="\u200B"
-    )
-    embed.add_field(
         name="Portal-unleashed",
         value="\nChrome extension allowing you to make your Portal Experience directly in "
               "pseudo-Javascript from a VSCode editor in your browser \n**[still in development]**\n Download from:- "
               "**N/A**\n"
               "Made by [ ludonope#4197 ]\u200B",
         inline=False
-    )
-    embed.add_field(
-        name="\u200B",
-        value="\u200B"
     )
     embed.add_field(
         name="Battlefield Portal Blocks",
