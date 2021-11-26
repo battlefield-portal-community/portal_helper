@@ -140,6 +140,49 @@ async def on_ready():
     print("Ready!")
 
 
+@slash.slash(name="tools", description="A list of tools/resources made by community", guild_ids=guild_ids)
+async def _tools(ctx):
+    embed = Embed(
+        title="By the Community For the Community",
+        url="https://bfportal.gg/",
+        description="**A list of tools/resources made by community**\u200B",
+        color=Color.green(),
+    )
+    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/908104736455155762/912999248910495784/Animation_logo_discord.gif")
+    embed.add_field(
+        name="BF2042-Portal-Extensions\n",
+        value="Extension to add various QOL features to portal's logic editor\n"
+              "[github.com/LennardF1989/BF2042-Portal-Extensions]("
+              "https://github.com/LennardF1989/BF2042-Portal-Extensions)\nMade by [ "
+              "LennardF1989#3733 ]",
+        inline=False
+    )
+    embed.add_field(
+        name="\u200B",
+        value="\u200B"
+    )
+    embed.add_field(
+        name="Portal-unleashed",
+        value="\nChrome extension allowing you to make your Portal Experience directly in "
+              "pseudo-Javascript from a VSCode editor in your browser \n**[still in development]**\n Download from:- "
+              "**N/A**\n"
+              "Made by [ ludonope#4197 ]\u200B",
+        inline=False
+    )
+    embed.add_field(
+        name="\u200B",
+        value="\u200B"
+    )
+    embed.add_field(
+        name="Battlefield Portal Blocks",
+        value="A repository of some useful Portal Rule Editor Blocks\n[github.com/Andygmb/Battlefield-Portal-Blocks]("
+              "https://github.com/Andygmb/Battlefield-Portal-Blocks) \nmaintained by [ andy#0743 ]",
+        inline=False
+    )
+    embed.set_footer(text="And lastly this bot which was made by [ gala#8316 ]")
+    await ctx.send(embed=embed)
+
+
 @slash.slash(name="d", description="Returns Documentation of a block")
 async def _d(ctx, block_name):
     try:
