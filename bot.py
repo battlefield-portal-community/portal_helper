@@ -140,7 +140,7 @@ async def on_ready():
     print("Ready!")
 
 
-@slash.slash(name="tools", description="A list of tools/resources made by community", guild_ids=guild_ids)
+@slash.slash(name="tools", description="A list of tools/resources made by community")
 async def _tools(ctx):
     embed = Embed(
         title="By the Community For the Community",
@@ -179,7 +179,9 @@ async def _tools(ctx):
               "https://github.com/Andygmb/Battlefield-Portal-Blocks) \nmaintained by [ andy#0743 ]",
         inline=False
     )
-    embed.set_footer(text="And lastly this bot which was made by [ gala#8316 ]")
+    embed.set_footer(text="And lastly this bot which was made by [ gala#8316 ] \nMaintained at\n"
+                          "https://github.com/p0lygun/portal-docs-bot")
+
     await ctx.send(embed=embed)
 
 
