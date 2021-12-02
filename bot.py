@@ -1,7 +1,7 @@
 import os
 from discord import ext, Embed, Color
-from discord_slash import SlashCommand # Importing the newly installed library.
-from thefuzz import fuzz, process
+from discord_slash import SlashCommand
+from thefuzz import fuzz,  process
 from github_api import DataHandler
 from dotenv import load_dotenv
 import logging
@@ -11,13 +11,13 @@ log_file = "log"
 logging.getLogger("discord").setLevel(logging.WARNING)
 logging.getLogger("discord_slash").setLevel(logging.WARNING)
 logging.basicConfig(filename=log_file,
-                            filemode='a',
-                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                            datefmt='%H:%M:%S',
-                            level=logging.DEBUG)
+                    filemode='a',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
 logging.info("New Start up!!")
 bot = ext.commands.Bot(command_prefix="!")
-slash = SlashCommand(bot, sync_commands=True) # Declares slash commands through the client.
+slash = SlashCommand(bot, sync_commands=True)  # Declares slash commands through the client.
 dh = DataHandler()
 dh.load_data()
 
@@ -42,17 +42,17 @@ def special_embeds(block_name):
             url=f"https://docs.bfportal.gg/docs/blocks/{doc_list[0]}",
             description=doc_list[1] + f"\n**{doc_list[3]}**"
         )
-        for i in range(4, len(doc_list)-1, 2):
+        for i in range(4, len(doc_list) - 1, 2):
             embed.add_field(
                 name=doc_list[i],
-                value=doc_list[i+1],
+                value=doc_list[i + 1],
                 inline=False
             )
         return embed
 
     if block_name == "all":
-        embed = Embed(title="All Blocks",url="https://docs.bfportal.gg/docs/blocks")
-        for block,value in dh.docs_dict.items():
+        embed = Embed(title="All Blocks", url="https://docs.bfportal.gg/docs/blocks")
+        for block, value in dh.docs_dict.items():
             embed.add_field(name="\u200b", value=f"[{value[1]}](https://docs.bfportal.gg/docs/blocks/{value[1]})")
         return embed
 
@@ -83,7 +83,7 @@ def make_embed(block_name):
         content = doc_list[1:][0]
     if "Output" in doc_list:
         if "Inputs" in doc_list:
-            inputs = doc_list[doc_list.index("Inputs")+1:doc_list.index("Output")]
+            inputs = doc_list[doc_list.index("Inputs") + 1:doc_list.index("Output")]
         output = doc_list[doc_list.index("Output") + 1:]
     else:
         if "Inputs" in doc_list:
@@ -101,8 +101,6 @@ def make_embed(block_name):
         tmp = output.split("Notes")
         notes = tmp[1]
         output = tmp[0]
-
-
 
     embed = Embed(
         title=title,
@@ -148,29 +146,43 @@ async def _tools(ctx):
         description="**A list of tools/resources made by community**\u200B",
         color=Color.green(),
     )
-    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/908104736455155762/912999248910495784/Animation_logo_discord.gif")
-    embed.add_field(
-        name="BF2042-Portal-Extensions\n",
-        value="Extension to add various QOL features to portal's logic editor\n"
-              "[github.com/LennardF1989/BF2042-Portal-Extensions]("
-              "https://github.com/LennardF1989/BF2042-Portal-Extensions)\nMade by [ "
-              "LennardF1989#3733 ]",
-        inline=False
-    )
-    embed.add_field(
-        name="Portal-unleashed",
-        value="\nChrome extension allowing you to make your Portal Experience directly in "
-              "pseudo-Javascript from a VSCode editor in your browser \n**[still in development]**\n Download from:- "
-              "**N/A**\n"
-              "Made by [ ludonope#4197 ]\u200B",
-        inline=False
-    )
-    embed.add_field(
-        name="Battlefield Portal Blocks",
-        value="A repository of some useful Portal Rule Editor Blocks\n[github.com/Andygmb/Battlefield-Portal-Blocks]("
-              "https://github.com/Andygmb/Battlefield-Portal-Blocks) \nmaintained by [ andy#0743 ]",
-        inline=False
-    )
+    spacer = {
+        "name": "\u200B",
+        "value": "\u200B"
+    }
+    fields = [
+        {
+            "name": "BF2042-Portal-Extensions\n",
+            "value": "Extension to add various QOL features to portal's logic editor\n"
+                     "[github.com/LennardF1989/BF2042-Portal-Extensions]("
+                     "https://github.com/LennardF1989/BF2042-Portal-Extensions)\nMade by [ "
+                     "LennardF1989#3733 ]",
+            "inline": False
+        },
+        {
+            "name": "Portal-unleashed",
+            "value": "\nChrome extension allowing you to make your Portal Experience directly in "
+                     "pseudo-Javascript from a VSCode editor in your browser\n Download "
+                     "from:-[github.com/Ludonope/BFPortalUnleashed](https://github.com/Ludonope/BFPortalUnleashed)\n"
+                     "Made by [ ludonope#4197 ]\u200B",
+            "inline": False
+        },
+        {
+            "name": "Battlefield Portal Blocks",
+            "value": "A repository of some useful Portal Rule Editor Blocks\n["
+                     "github.com/Andygmb/Battlefield-Portal-Blocks]( "
+                     "https://github.com/Andygmb/Battlefield-Portal-Blocks) \nmaintained by [ andy#0743 ]",
+            "inline": False
+        }
+    ]
+
+    embed.set_thumbnail(
+        url="https://cdn.discordapp.com/attachments/908104736455155762/912999248910495784/Animation_logo_discord.gif")
+
+    for i in fields:
+        embed.add_field(**i)
+        embed.add_field(**spacer)
+
     embed.set_footer(text="And lastly this bot which was made by [ gala#8316 ] \nMaintained at\n"
                           "https://github.com/p0lygun/portal-docs-bot")
 
@@ -181,6 +193,7 @@ async def _tools(ctx):
 async def _d(ctx, block_name):
     try:
         embed = make_embed(block_name)
+        embed.set_footer(text="click on title to go to full documentation")
         await ctx.send(embed=embed)
     except NotImplementedError as e:
         logging.warning(e)
