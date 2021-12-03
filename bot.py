@@ -163,7 +163,7 @@ async def _tools(ctx):
             "name": "Portal-unleashed",
             "value": "\nChrome extension allowing you to make your Portal Experience directly in "
                      "pseudo-Javascript from a VSCode editor in your browser\n Download "
-                     "from:-[github.com/Ludonope/BFPortalUnleashed](https://github.com/Ludonope/BFPortalUnleashed)\n"
+                     "from:- [github.com/Ludonope/BFPortalUnleashed](https://github.com/Ludonope/BFPortalUnleashed)\n"
                      "Made by [ ludonope#4197 ]\u200B",
             "inline": False
         },
