@@ -128,7 +128,7 @@ def make_embed(block_name):
             value=notes,
             inline=False
         )
-    print(embed.url)
+    #print(embed.url)
     return embed
 
 
@@ -220,4 +220,4 @@ async def _d(ctx, block_name):
             )
         )
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+bot.run(os.getenv("DISCORD_TEST"))
