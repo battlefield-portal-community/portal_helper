@@ -8,17 +8,17 @@ import logging
 
 load_dotenv()
 log_file = "log"
-#logging.getLogger("discord").setLevel(logging.WARNING)
-#logging.getLogger("discord_slash").setLevel(logging.WARNING)
-# logging.basicConfig(filename=log_file,
-#                     filemode='a',
-#                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-#                     datefmt='%H:%M:%S',
-#                     level=logging.DEBUG)
-logging.basicConfig(
+logging.getLogger("discord").setLevel(logging.WARNING)
+logging.getLogger("discord_slash").setLevel(logging.WARNING)
+logging.basicConfig(filename=log_file,
+                    filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
+# logging.basicConfig(
+#                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+#                     datefmt='%H:%M:%S',
+#                     level=logging.DEBUG)
 logging.info("New Start up!!")
 bot = ext.commands.Bot(command_prefix="!")
 slash = SlashCommand(bot, sync_commands=True)  # Declares slash commands through the client.
