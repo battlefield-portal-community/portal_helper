@@ -8,10 +8,14 @@ import logging
 
 load_dotenv()
 log_file = "log"
-logging.getLogger("discord").setLevel(logging.WARNING)
-logging.getLogger("discord_slash").setLevel(logging.WARNING)
-logging.basicConfig(filename=log_file,
-                    filemode='a',
+#logging.getLogger("discord").setLevel(logging.WARNING)
+#logging.getLogger("discord_slash").setLevel(logging.WARNING)
+# logging.basicConfig(filename=log_file,
+#                     filemode='a',
+#                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+#                     datefmt='%H:%M:%S',
+#                     level=logging.DEBUG)
+logging.basicConfig(
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
@@ -101,10 +105,10 @@ def make_embed(block_name):
         tmp = output.split("Notes")
         notes = tmp[1]
         output = tmp[0]
-
+    url = title.replace(" ", "")
     embed = Embed(
         title=title,
-        url=f"https://docs.bfportal.gg/docs/blocks/{title}",
+        url=f"https://docs.bfportal.gg/docs/blocks/{url}",
         description=content
     )
     if inputs:
@@ -124,6 +128,7 @@ def make_embed(block_name):
             value=notes,
             inline=False
         )
+    print(embed.url)
     return embed
 
 

@@ -45,6 +45,7 @@ class DataHandler:
         if target not in self.docs_dict.keys():
             return ValueError("Specified Block not found")
         url = self.github_sha_base_url.format(self.docs_dict[target][0])
+        print(url)
         try:
             data = get(url).json()
             if data.get("message") == "Not Found":
@@ -60,7 +61,10 @@ class DataHandler:
 
 if __name__ == "__main__":
     DataHandler().update_data()
-#    # content = ''
+    # dh = DataHandler()
+    # dh.update_data()
+    # doc_list = dh.get_doc("farthestplayerfrom").split('\n')
+    # content = ''
     # inputs = ''
     # output = ''
     # title = doc_list[0]
@@ -75,4 +79,4 @@ if __name__ == "__main__":
     #     inputs = doc_list[doc_list.index("Inputs") + 1:]
     #
     # print(title, content, inputs, output)
-    #print(doc_list)
+    # print(doc_list)
