@@ -45,7 +45,7 @@ class DataHandler:
         if target not in self.docs_dict.keys():
             return ValueError("Specified Block not found")
         url = self.github_sha_base_url.format(self.docs_dict[target][0])
-        print(url)
+
         try:
             data = get(url).json()
             if data.get("message") == "Not Found":
