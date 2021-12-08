@@ -220,4 +220,4 @@ async def _d(ctx, block_name):
             )
         )
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+bot.run(os.getenv("DISCORD_TEST"))

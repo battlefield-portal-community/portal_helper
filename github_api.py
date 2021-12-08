@@ -26,7 +26,13 @@ class DataHandler:
                     pass
                 else:
                     self.docs_dict.update({path.stem.lower(): [item["sha"], path.stem]})
-
+        self.docs_dict.update({
+            "countof":
+                [
+                    "bb74624e448dee2d919aa0d071ab16374c5e4c32",
+                    "CountOf"
+                ]
+        })
         with open(self.local_file_path, 'w') as FILE:
             json.dump(self.docs_dict, FILE)
 
@@ -63,7 +69,7 @@ if __name__ == "__main__":
     DataHandler().update_data()
     # dh = DataHandler()
     # dh.update_data()
-    # doc_list = dh.get_doc("farthestplayerfrom").split('\n')
+    # doc_list = dh.get_doc("countof").split('\n')
     # content = ''
     # inputs = ''
     # output = ''
