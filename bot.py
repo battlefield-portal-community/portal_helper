@@ -220,4 +220,25 @@ async def _d(ctx, block_name):
             )
         )
 
+
+@slash.slash(name="reload", description="reloads local cache on bot server")
+async def reload(ctx):
+    if ctx.author.guild_permissions.administrator:
+        try:
+            await ctx.send(
+                embed=Embed(
+                    title="Successfully Updated sha-mapping",
+                    description="\u200b",
+                    colour=Color.green()
+                )
+            )
+        except BaseException as e:
+            logging.warning(e)
+            await ctx.send(
+                embed=Embed(
+                    title="Updating Local cache failed",
+                    description="\u200b",
+                    colour=Color.red()
+                )
+            )
 bot.run(os.getenv("DISCORD_TOKEN"))
