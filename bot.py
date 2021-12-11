@@ -1,5 +1,6 @@
 import os
 from discord import ext, Embed, Color
+from discord.ext import tasks
 from discord_slash import SlashCommand
 from thefuzz import fuzz,  process
 from github_api import DataHandler
@@ -141,6 +142,13 @@ def get_closest_match(block):
 @bot.event
 async def on_ready():
     print("Ready!")
+    purge_logs.start()
+
+
+@tasks.loop(hours=24*7)  # after 7 days
+async def purge_logs():
+    with open("log", "w") as FILE:
+        FILE.truncate(0)
 
 
 @slash.slash(name="tools", description="A list of tools/resources made by community")
@@ -210,6 +218,8 @@ async def _d(ctx, block_name):
             ),
             delete_after=10
         )
+    except BaseException as e:
+        logging.warning(f"Error with {block_name} {get_closest_match(block_name)}")
     except ValueError as e:
         logging.critical(e)
         await ctx.send(
@@ -241,4 +251,5 @@ async def reload(ctx):
                     colour=Color.red()
                 )
             )
+
 bot.run(os.getenv("DISCORD_TOKEN"))
