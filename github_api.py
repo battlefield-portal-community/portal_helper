@@ -22,7 +22,7 @@ class DataHandler:
         for item in git_tree_json:
             path = Path(item["path"])
             if path.match("docs/blocks/*.md"):
-                if path.name == "index.md":
+                if path.name in ["index.md", "IndexOfFirstTrue.md"]:
                     pass
                 else:
                     self.docs_dict.update({path.stem.lower(): [item["sha"], path.stem]})
