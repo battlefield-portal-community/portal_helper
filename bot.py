@@ -2,6 +2,8 @@ import os
 from discord import ext, Embed, Color
 from discord.ext import tasks
 from discord_slash import SlashCommand
+from discord_slash.utils.manage_commands import create_option, create_choice
+from discord_slash.model import SlashCommandOptionType
 from thefuzz import fuzz,  process
 from github_api import DataHandler
 from dotenv import load_dotenv
@@ -151,8 +153,14 @@ async def purge_logs():
         FILE.truncate(0)
 
 
-@slash.slash(name="tools", description="A list of tools/resources made by community")
-async def _tools(ctx):
+@slash.slash(name="tools", description="A list of tools/resources made by community", options=[
+    create_option(
+        name="hidden",
+        description="If True only you can see the output",
+        option_type=SlashCommandOptionType.BOOLEAN,
+        required=False
+    )])
+async def tools(ctx, hidden: bool = False):
     embed = Embed(
         title="By the Community For the Community",
         url="https://bfportal.gg/",
@@ -199,15 +207,27 @@ async def _tools(ctx):
     embed.set_footer(text="And lastly this bot which was made by [ gala#8316 ] \nMaintained at\n"
                           "https://github.com/p0lygun/portal-docs-bot")
 
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, hidden=hidden)
 
 
-@slash.slash(name="d", description="Returns Documentation of a block")
-async def _d(ctx, block_name):
+@slash.slash(name="d", description="Returns Documentation of a block", options=[
+    create_option(
+        name="block_name",
+        description="Name of the Block. fuzzy search and lowercase search is on",
+        option_type=SlashCommandOptionType.STRING,
+        required=True
+    ),
+    create_option(
+        name="hidden",
+        description="If True only you can see the output",
+        option_type=SlashCommandOptionType.BOOLEAN,
+        required=False
+    )])
+async def _d(ctx, block_name, hidden: bool = False):
     try:
         embed = make_embed(block_name)
         embed.set_footer(text="click on title to go to full documentation")
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, hidden=hidden)
     except NotImplementedError as e:
         logging.warning(e)
         await ctx.send(
@@ -216,7 +236,8 @@ async def _d(ctx, block_name):
                 description=f"Command {block_name}",
                 colour=Color.red()
             ),
-            delete_after=10
+            delete_after=10,
+            hidden=hidden
         )
     except BaseException as e:
         logging.warning(f"Error with {block_name} {get_closest_match(block_name)}")
@@ -226,7 +247,8 @@ async def _d(ctx, block_name):
             embed=Embed(
                 title=f"Error getting docs for {block_name}",
                 description="\u200b",
-                colour=Color.red()
+                colour=Color.red(),
+                hidden=hidden
             )
         )
 
