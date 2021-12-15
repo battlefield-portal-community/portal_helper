@@ -1,34 +1,26 @@
 import os
-from discord import ext, Embed, Color
-from discord.ext import tasks
-from discord_slash import SlashCommand
-from discord_slash.utils.manage_commands import create_option, create_choice
-from discord_slash.model import SlashCommandOptionType
-from thefuzz import fuzz,  process
+import random
+
+from thefuzz import fuzz
 from github_api import DataHandler
 from dotenv import load_dotenv
+from interactions import Embed
+from interactions import Choice, Option, OptionType, Client
 import logging
 
 load_dotenv()
 log_file = "log"
-logging.getLogger("discord").setLevel(logging.WARNING)
-logging.getLogger("discord_slash").setLevel(logging.WARNING)
+
 logging.basicConfig(filename=log_file,
                     filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
-# logging.basicConfig(
-#                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-#                     datefmt='%H:%M:%S',
-#                     level=logging.DEBUG)
-logging.info("New Start up!!")
-bot = ext.commands.Bot(command_prefix="!")
-slash = SlashCommand(bot, sync_commands=True)  # Declares slash commands through the client.
-dh = DataHandler()
-dh.load_data()
 
-guild_ids = [829265067073339403, 870246147455877181, 451430013615734784]
+logging.info("New Start up!!")
+bot = Client(token=os.getenv("DISCORD_TOKEN"))
+dh = DataHandler(update=True)
+dh.load_data()
 
 
 def make_bold(text):
@@ -41,27 +33,33 @@ def make_bold(text):
     return content_final
 
 
+def get_choice_list():
+    return [Choice(name=j[1], value=i) for i, j in dh.docs_dict.items()]
+
+
 def special_embeds(block_name):
     if block_name == "rule":
         doc_list = [i for i in dh.get_doc("rule").split("\n") if i != ""]
+
+        fields_list = []
+        for i in range(4, len(doc_list) - 1, 2):
+            fields_list.append({
+                "name": doc_list[i],
+                "value": doc_list[i + 1],
+                "inline": False
+            })
+
         embed = Embed(
             title=make_bold(doc_list[0]),
             url=f"https://docs.bfportal.gg/docs/blocks/{doc_list[0]}",
-            description=doc_list[1] + f"\n**{doc_list[3]}**"
+            description=doc_list[1] + f"\n**{doc_list[3]}**",
+            color=int(random.choice(colors), 16),
+            fields=fields_list
         )
-        for i in range(4, len(doc_list) - 1, 2):
-            embed.add_field(
-                name=doc_list[i],
-                value=doc_list[i + 1],
-                inline=False
-            )
         return embed
 
     if block_name == "all":
-        embed = Embed(title="All Blocks", url="https://docs.bfportal.gg/docs/blocks")
-        for block, value in dh.docs_dict.items():
-            embed.add_field(name="\u200b", value=f"[{value[1]}](https://docs.bfportal.gg/docs/blocks/{value[1]})")
-        return embed
+        pass
 
 
 def make_embed(block_name):
@@ -109,64 +107,62 @@ def make_embed(block_name):
         notes = tmp[1]
         output = tmp[0]
     url = title.replace(" ", "")
+    embed_fields = []
+    if inputs:
+        embed_fields.append({
+            "name": "Inputs",
+            "value": inputs,
+            "inline": False
+        })
+    if output:
+        embed_fields.append({
+            "name": "Output",
+            "value": output
+        })
+    if notes:
+        embed_fields.append({
+            "name": "Notes",
+            "value": notes,
+            "inline": False
+        })
     embed = Embed(
         title=title,
         url=f"https://docs.bfportal.gg/docs/blocks/{url}",
-        description=content
+        description=content,
+        color=int(random.choice(colors), 16),
+        footer={"text": "click on title to go to full documentation"},
+        fields=embed_fields
     )
-    if inputs:
-        embed.add_field(
-            name="Inputs",
-            value=inputs,
-            inline=False
-        )
-    if output:
-        embed.add_field(
-            name="Output",
-            value=output
-        )
-    if notes:
-        embed.add_field(
-            name="Notes",
-            value=notes,
-            inline=False
-        )
-    #print(embed.url)
     return embed
 
 
-def get_closest_match(block):
+def get_closest_match(block, l : bool = False):
     ratio_list = [(i, fuzz.ratio(block, i)) for i in dh.docs_dict.keys()]
     ratio_list.sort(key=lambda x: x[1], reverse=True)
+    if l:
+        return ratio_list
     return ratio_list[0][0]
 
+
+hidden = Option(
+        name="hidden",
+        description="If set to true only you can see it :smile:",
+        type=OptionType.BOOLEAN,
+        required=False
+)
+colors = ["011C26", "025159", "08A696", "26FFDF", "F26A1B", "FF2C10"]
 
 @bot.event
 async def on_ready():
     print("Ready!")
-    purge_logs.start()
 
 
-@tasks.loop(hours=24*7)  # after 7 days
-async def purge_logs():
-    with open("log", "w") as FILE:
-        FILE.truncate(0)
-
-
-@slash.slash(name="tools", description="A list of tools/resources made by community", options=[
-    create_option(
-        name="hidden",
-        description="If True only you can see the output",
-        option_type=SlashCommandOptionType.BOOLEAN,
-        required=False
-    )])
-async def tools(ctx, hidden: bool = False):
-    embed = Embed(
-        title="By the Community For the Community",
-        url="https://bfportal.gg/",
-        description="**A list of tools/resources made by community**\u200B",
-        color=Color.green(),
-    )
+@bot.command(
+    name="tools",
+    description="A list of tools/resources made by community",
+    options=[hidden]
+)
+async def tools(ctx, hidden: bool= False):
     spacer = {
         "name": "\u200B",
         "value": "\u200B"
@@ -196,82 +192,113 @@ async def tools(ctx, hidden: bool = False):
             "inline": False
         }
     ]
+    footer_text = "And lastly this bot which was made by [ gala#8316 ] " \
+                  "\nMaintained at\n https://github.com/p0lygun/portal-docs-bot"
+    thumbnail_url = "https://cdn.discordapp.com/attachments/" \
+                    "908104736455155762/912999248910495784/Animation_logo_discord.gif"
 
-    embed.set_thumbnail(
-        url="https://cdn.discordapp.com/attachments/908104736455155762/912999248910495784/Animation_logo_discord.gif")
-
+    embed_field_list = []
     for i in fields:
-        embed.add_field(**i)
-        embed.add_field(**spacer)
+        embed_field_list.append(i)
+        embed_field_list.append(spacer)
 
-    embed.set_footer(text="And lastly this bot which was made by [ gala#8316 ] \nMaintained at\n"
-                          "https://github.com/p0lygun/portal-docs-bot")
+    await ctx.send(
+        embeds=[
+            Embed(
+                title="By the Community For the Community",
+                url="https://bfportal.gg/",
+                description="**A list of tools/resources made by community**\u200B",
+                color=int(random.choice(colors), 16),
+                thumbnail={"url": thumbnail_url},
+                footer={"text": footer_text},
+                fields=[f(i) for i in fields for f in (lambda x: x, lambda x: spacer)]
+            )
+        ], ephemeral=hidden
+    )
 
-    await ctx.send(embed=embed, hidden=hidden)
 
-
-@slash.slash(name="d", description="Returns Documentation of a block", options=[
-    create_option(
-        name="block_name",
-        description="Name of the Block. fuzzy search and lowercase search is on",
-        option_type=SlashCommandOptionType.STRING,
-        required=True
-    ),
-    create_option(
-        name="hidden",
-        description="If True only you can see the output",
-        option_type=SlashCommandOptionType.BOOLEAN,
-        required=False
-    )])
-async def _d(ctx, block_name, hidden: bool = False):
+@bot.command(name="d", description="Returns Documentation of a block",
+             options=[
+                 Option(
+                     name="block_name",
+                     description="Name of the Block. fuzzy search and lowercase search is on",
+                     type=OptionType.STRING,
+                     autocomplete=True,
+                 ), hidden],
+             )
+async def d(ctx, block_name, hidden: bool = False):
     try:
         embed = make_embed(block_name)
-        embed.set_footer(text="click on title to go to full documentation")
-        await ctx.send(embed=embed, hidden=hidden)
+        await ctx.send(embeds=[embed], ephemeral=hidden)
     except NotImplementedError as e:
         logging.warning(e)
         await ctx.send(
-            embed=Embed(
+            embeds=[Embed(
                 title="Not Yet Implemented",
                 description=f"Command {block_name}",
-                colour=Color.red()
-            ),
-            delete_after=10,
-            hidden=hidden
+                colour=int("ff0000", 16)
+            )], ephemeral=hidden,
         )
     except BaseException as e:
         logging.warning(f"Error with {block_name} {get_closest_match(block_name)}")
+        await ctx.send(
+            embeds=[Embed(
+                title=f"Error getting docs for {block_name}",
+                description="\u200b",
+                colour=int("ff0000", 16),
+            )], ephemeral=hidden
+        )
+        raise
     except ValueError as e:
         logging.critical(e)
         await ctx.send(
-            embed=Embed(
+            embeds=[Embed(
                 title=f"Error getting docs for {block_name}",
                 description="\u200b",
-                colour=Color.red(),
-                hidden=hidden
-            )
+                colour=int("ff0000", 16),
+            )], ephemeral=hidden
         )
 
 
-@slash.slash(name="reload", description="reloads local cache on bot server")
+@bot.autocomplete("block_name")
+async def autocomplete_block_name(ctx):
+    typed = ctx.data.options[0]["value"]
+    if ctx.data.options[0]["focused"]:
+        if typed == '':
+            await ctx.populate(get_choice_list()[0:25])
+        else:
+
+            await ctx.populate([
+                Choice(name=dh.docs_dict[i[0]][1], value=i[0]) for i in get_closest_match(typed, True)[0:10]
+            ])
+
+
+
+@bot.command(
+    name="reload",
+    description="reloads local cache on bot server",
+    scope=829265067073339403
+)
 async def reload(ctx):
-    if ctx.author.guild_permissions.administrator:
+    if ctx.author.user.id == "338947895665360898":
         try:
+            dh.update_data()
             await ctx.send(
-                embed=Embed(
+                embeds=[Embed(
                     title="Successfully Updated sha-mapping",
                     description="\u200b",
-                    colour=Color.green()
-                )
+                    colour=int("00ff00", 16)
+                )], ephemeral=hidden
             )
         except BaseException as e:
             logging.warning(e)
             await ctx.send(
-                embed=Embed(
+                embeds=[Embed(
                     title="Updating Local cache failed",
                     description="\u200b",
-                    colour=Color.red()
-                )
+                    colour=int("ff0000", 16)
+                )], ephemeral=hidden
             )
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+
+bot.start()
