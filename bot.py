@@ -1,5 +1,6 @@
 import os
 import random
+from pathlib import Path
 
 from thefuzz import fuzz
 from github_api import DataHandler
@@ -7,19 +8,18 @@ from dotenv import load_dotenv
 from interactions import Embed
 from interactions import Choice, Option, OptionType, Client
 import logging
+from logging import handlers
 
 load_dotenv()
-log_file = "log"
-
-logging.basicConfig(filename=log_file,
-                    filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
-                    level=logging.DEBUG)
-
-logging.info("New Start up!!")
-bot = Client(token=os.getenv("DISCORD_TOKEN"))
-dh = DataHandler(update=True)
+bot = Client(token=os.getenv("DISCORD_TOKEN"), log_level=logging.CRITICAL)
+logging.getLogger("mixin").setLevel(logging.CRITICAL)
+for name in ["client", "context", "dispatch", "gateway", "http", "mixin"]:
+    ch = handlers.TimedRotatingFileHandler(f"{Path.cwd()}", 'midnight', 1)
+    ch.setLevel(logging.DEBUG)
+    logging.getLogger(name).addHandler(ch)
+    logging.getLogger(name).addHandler(ch)
+logger = logging.getLogger("client")
+dh = DataHandler(update=False)
 dh.load_data()
 
 
@@ -160,7 +160,7 @@ async def on_ready():
 @bot.command(
     name="tools",
     description="A list of tools/resources made by community",
-    options=[hidden]
+    options=[hidden],
 )
 async def tools(ctx, hidden: bool= False):
     spacer = {
@@ -224,14 +224,14 @@ async def tools(ctx, hidden: bool= False):
                      description="Name of the Block. fuzzy search and lowercase search is on",
                      type=OptionType.STRING,
                      autocomplete=True,
-                 ), hidden],
+                 ), hidden]
              )
 async def d(ctx, block_name, hidden: bool = False):
     try:
         embed = make_embed(block_name)
         await ctx.send(embeds=[embed], ephemeral=hidden)
     except NotImplementedError as e:
-        logging.warning(e)
+        logger.warning(e)
         await ctx.send(
             embeds=[Embed(
                 title="Not Yet Implemented",
@@ -240,7 +240,7 @@ async def d(ctx, block_name, hidden: bool = False):
             )], ephemeral=hidden,
         )
     except BaseException as e:
-        logging.warning(f"Error with {block_name} {get_closest_match(block_name)}")
+        logger.warning(f"Error with {block_name} {get_closest_match(block_name)}")
         await ctx.send(
             embeds=[Embed(
                 title=f"Error getting docs for {block_name}",
@@ -250,7 +250,7 @@ async def d(ctx, block_name, hidden: bool = False):
         )
         raise
     except ValueError as e:
-        logging.critical(e)
+        logger.critical(e)
         await ctx.send(
             embeds=[Embed(
                 title=f"Error getting docs for {block_name}",
@@ -291,7 +291,7 @@ async def reload(ctx):
                 )], ephemeral=hidden
             )
         except BaseException as e:
-            logging.warning(e)
+            logger.warning(e)
             await ctx.send(
                 embeds=[Embed(
                     title="Updating Local cache failed",
