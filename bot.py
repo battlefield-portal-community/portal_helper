@@ -11,11 +11,11 @@ import logging
 from logging import handlers
 
 load_dotenv()
-bot = Client(token=os.getenv("DISCORD_TOKEN"), log_level=logging.CRITICAL)
 logging.getLogger("mixin").setLevel(logging.CRITICAL)
+bot = Client(token=os.getenv("DISCORD_TOKEN"), log_level=logging.CRITICAL)
 for name in ["client", "context", "dispatch", "gateway", "http", "mixin"]:
     ch = handlers.TimedRotatingFileHandler(f"{Path.cwd()/ 'log' }", 'midnight', 1)
-    ch.setLevel(logging.DEBUG)
+    ch.setLevel(logging.INFO)
     logging.getLogger(name).addHandler(ch)
     logging.getLogger(name).addHandler(ch)
 logger = logging.getLogger("client")
