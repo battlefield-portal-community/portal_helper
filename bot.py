@@ -14,7 +14,7 @@ load_dotenv()
 bot = Client(token=os.getenv("DISCORD_TOKEN"), log_level=logging.CRITICAL)
 logging.getLogger("mixin").setLevel(logging.CRITICAL)
 for name in ["client", "context", "dispatch", "gateway", "http", "mixin"]:
-    ch = handlers.TimedRotatingFileHandler(f"{Path.cwd()}", 'midnight', 1)
+    ch = handlers.TimedRotatingFileHandler(f"{Path.cwd()/ 'log' }", 'midnight', 1)
     ch.setLevel(logging.DEBUG)
     logging.getLogger(name).addHandler(ch)
     logging.getLogger(name).addHandler(ch)
