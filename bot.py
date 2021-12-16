@@ -15,12 +15,24 @@ logging.getLogger("mixin").setLevel(logging.CRITICAL)
 bot = Client(token=os.getenv("DISCORD_TOKEN"), log_level=logging.CRITICAL)
 for name in ["client", "context", "dispatch", "gateway", "http", "mixin"]:
     logger = logging.getLogger(name)
+    logger.setLevel(logging.CRITICAL)
     ch = handlers.TimedRotatingFileHandler(f"{Path.cwd()/ 'log' }", 'midnight', 1)
     ch.setLevel(logging.INFO)
     logger.addHandler(ch)
-    logger.setLevel(logging.CRITICAL)
 
-logger = logging.getLogger("client")
+logger = logging.getLogger("portal")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+ch = handlers.TimedRotatingFileHandler(f"{Path.cwd() / 'log'}", 'midnight', 1)
+sh = logging.StreamHandler()
+
+ch.setLevel(logging.DEBUG)
+sh.setLevel(int(os.getenv("LOG_LEVEL")))
+sh.setFormatter(formatter)
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
+logger.addHandler(sh)
+
 dh = DataHandler(update=False)
 dh.load_data()
 
@@ -242,7 +254,7 @@ async def d(ctx, block_name, hidden: bool = False):
             )], ephemeral=hidden,
         )
     except BaseException as e:
-        logger.warning(f"Error with {block_name} {get_closest_match(block_name)}")
+        logger.warning(f"Error {e} with {block_name} {get_closest_match(block_name)}")
         await ctx.send(
             embeds=[Embed(
                 title=f"Error getting docs for {block_name}",
@@ -273,7 +285,6 @@ async def autocomplete_block_name(ctx):
             await ctx.populate([
                 Choice(name=dh.docs_dict[i[0]][1], value=i[0]) for i in get_closest_match(typed, True)[0:10]
             ])
-
 
 
 @bot.command(
