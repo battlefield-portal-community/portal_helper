@@ -11,7 +11,7 @@ from loguru import logger
 from utils.helper import devGuildID, COLORS
 from utils.github_api import DataHandler
 
-dh = DataHandler(update=False)
+dh = DataHandler(update=False if os.getenv("PD_DEVELOPMENT") == "True" else True)
 dh.load_data()
 
 
