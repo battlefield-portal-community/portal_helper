@@ -12,7 +12,7 @@ class ToolsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(name="tools", guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else [])
+    @slash_command(name="tools", guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None)
     async def tools(self, ctx, hidden: Option(bool, "If set to true only you can see it", required=False)):
         embed = Embed(
             title="By the Community For the Community",
