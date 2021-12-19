@@ -4,13 +4,14 @@ import base64
 from pathlib import Path
 from markdown import markdown
 from bs4 import BeautifulSoup
+from loguru import logger
 
 
 class DataHandler:
     def __init__(self, update: bool = True):
         self.github_endpoint = r"https://api.github.com/repos/LennardF1989/BF2042-Portal-Docs/git/trees/master?recursive=1"
         self.github_sha_base_url = r"https://api.github.com/repos/LennardF1989/BF2042-Portal-Docs/git/blobs/{}"
-        self.local_file_path = "data/blocks_info"
+        self.local_file_path = "../data/blocks_info"
         Path(self.local_file_path).parent.mkdir(exist_ok=True)
         Path(self.local_file_path).touch(exist_ok=True)
         self.__md = markdown
@@ -19,6 +20,7 @@ class DataHandler:
             self.update_data()
 
     def update_data(self):
+        logger.debug("Updating GitHub data")
         git_tree_json = get(self.github_endpoint).json()["tree"]
         for item in git_tree_json:
             path = Path(item["path"])
@@ -36,9 +38,10 @@ class DataHandler:
         })
         with open(self.local_file_path, 'w') as FILE:
             json.dump(self.docs_dict, FILE)
+        logger.debug("Updating GitHub Complete")
 
     def load_data(self):
-        tmp = ""
+        logger.debug("Loading GitHub Data")
         with open(self.local_file_path) as FILE:
             tmp = FILE.read()
         try:
@@ -47,6 +50,7 @@ class DataHandler:
             raise
 
         self.docs_dict = json_data
+        logger.debug("Loading GitHub Data Complete")
 
     def get_doc(self, target):
         if target not in self.docs_dict.keys():
