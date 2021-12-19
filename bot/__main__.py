@@ -7,8 +7,9 @@ from dotenv import load_dotenv
 if __name__ == "__main__":
     load_dotenv()
     logger.add(sys.stderr, format="{time}{level}{message}", filter="my_module", level=int(os.getenv("PD_LOG_LEVEL")))
-    Path("logs").mkdir(exist_ok=True)
-    logger.add(r"logs\log_{time}", retention=7, rotation="500 MB", level="DEBUG")
+    logs_dir = Path("logs")
+    logs_dir.mkdir(exist_ok=True)
+    logger.add(logs_dir / "{time}.log", retention=7, rotation="500 MB", level="DEBUG")
     logger.info("Starting Bot ...")
     try:
         from .bot import PortalDocsBot
