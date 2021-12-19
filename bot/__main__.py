@@ -1,9 +1,11 @@
 import sys
 from loguru import logger
+from pathlib import Path
 
 if __name__ == "__main__":
     logger.add(sys.stderr, format="{time}{level}{message}", filter="my_module", level="DEBUG")
-    #logger.add(r"logs\log_{time}", retention=7, rotation="500 MB", level="DEBUG")
+    Path("logs").mkdir(exist_ok=True)
+    logger.add(r"logs\log_{time}", retention=7, rotation="500 MB", level="DEBUG")
     logger.info("Starting Bot ...")
     try:
         from .bot import PortalDocsBot
