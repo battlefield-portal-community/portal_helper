@@ -117,11 +117,10 @@ class ExperienceUrlEmbed(commands.Cog):
             url=f"{experience_info['mapRotation']['maps'][0]['image']}"
         )
 
-        # todo: will add this once the api.gametools.network/playground has all the owner info
-        # player_name = requests.get(
-        #     f"https://fesl.gametools.network/persona/cem_ea_id/by-id/{experience_info['owner']['personaId']}"
-        # ).json()['name']
-        # embed.set_footer(text=f"Experience Made by {player_name}")
+        embed.set_footer(
+            text=f"Experience Made by {experience_info['owner']['name']}",
+            icon_url=experience_info['owner']['avatar']
+        )
 
         # send the embed :)
         await ctx.respond(embeds=[embed])
