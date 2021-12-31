@@ -158,7 +158,7 @@ class DocumentationCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(name="d", guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else [])
+    @slash_command(name="d", guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None)
     async def docs(self,
                    ctx: discord.ApplicationContext,
                    block_name: Option(str, "Name of the block",
