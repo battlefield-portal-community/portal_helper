@@ -15,7 +15,11 @@ class ExperienceUrlEmbed(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(name="experience_embed", guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None)
+    @slash_command(
+        name="experience_embed",
+        guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None,
+        description="Shows info about portal experiences"
+    )
     async def make_url_embed(self, ctx,
                              url: Option(str, "Url of the experience", required=False),
                              playground_id: Option(str, "PlaygroundID of the experience", required=False)

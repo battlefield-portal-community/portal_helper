@@ -158,7 +158,11 @@ class DocumentationCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(name="d", guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None)
+    @slash_command(
+        name="d",
+        guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None,
+        description="Returns the documentation of a block used in portal's rule editor"
+    )
     async def docs(self,
                    ctx: discord.ApplicationContext,
                    block_name: Option(str, "Name of the block",

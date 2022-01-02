@@ -12,7 +12,11 @@ class ToolsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(name="tools", guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None)
+    @slash_command(
+        name="tools",
+        guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None,
+        description="Shows a list of tools made by the battlefield community"
+    )
     async def tools(self, ctx, hidden: Option(bool, "If set to true only you can see it", required=False)):
         fields = [{
             "name": "BF2042-Portal-Extensions",
