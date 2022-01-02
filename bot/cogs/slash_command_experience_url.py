@@ -16,7 +16,7 @@ class ExperienceUrlEmbed(commands.Cog):
         self.bot = bot
 
     @slash_command(
-        name="experience_embed",
+        name="experience_info",
         guild_ids=[devGuildID] if os.getenv("PD_DEVELOPMENT") == "True" else None,
         description="Shows info about portal experiences"
     )
