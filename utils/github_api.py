@@ -11,7 +11,7 @@ class DataHandler:
     def __init__(self, update: bool = True):
         self.github_endpoint = r"https://api.github.com/repos/LennardF1989/BF2042-Portal-Docs/git/trees/master?recursive=1"
         self.github_sha_base_url = r"https://api.github.com/repos/LennardF1989/BF2042-Portal-Docs/git/blobs/{}"
-        self.local_file_path = "../data/blocks_info"
+        self.local_file_path = Path(__file__).parents[1] / "data/blocks_info"
         Path(self.local_file_path).parent.mkdir(exist_ok=True)
         Path(self.local_file_path).touch(exist_ok=True)
         self.__md = markdown
