@@ -5,7 +5,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 if __name__ == "__main__":
-    load_dotenv()
+    # for local developement
+    if not os.getenv("PD_DISCORD_TOKEN"):
+        load_dotenv()
     logger.add(sys.stderr, format="{time}{level}{message}", filter="my_module", level=int(os.getenv("PD_LOG_LEVEL")))
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)

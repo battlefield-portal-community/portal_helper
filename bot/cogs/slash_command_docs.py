@@ -2,16 +2,16 @@ import os
 import random
 
 import discord
+from rapidfuzz import fuzz
 from discord.commands import slash_command, Option
 from discord.ext import commands
 from discord.embeds import Embed
-from thefuzz import fuzz
 from loguru import logger
 
 from utils.helper import devGuildID, COLORS
 from utils.github_api import DataHandler
 
-dh = DataHandler(update=False if os.getenv("PD_DEVELOPMENT") == "True" else True)
+dh = DataHandler()
 dh.load_data()
 
 
