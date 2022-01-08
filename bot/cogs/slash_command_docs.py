@@ -82,6 +82,8 @@ def make_embed(block_name: str) -> discord.Embed:
     :param block_name: str
     :return: discord.Embed
     """
+    image_url = f"https://portal-helper-block-images.s3.amazonaws.com/blocks_images/{block_name}.png"
+    block_name = block_name.lower()
     if block_name == "all":
         # todo: Show Complete list of all blocks
         raise NotImplementedError("command to get all blocks not implemented yet")
@@ -151,6 +153,7 @@ def make_embed(block_name: str) -> discord.Embed:
     )
     for field in embed_fields:
         embed.add_field(**field)
+    embed.set_image(url=image_url)
     return embed
 
 
@@ -169,7 +172,6 @@ class DocumentationCog(commands.Cog):
                                       autocomplete=discord.utils.basic_autocomplete(get_autocomplete_blocks)),
                    hidden: Option(bool, "If this is set to true only you can see the output", required=False)
                    ):
-        block_name = block_name.lower()
         try:
             embed = make_embed(block_name)
             await ctx.respond(embeds=[embed], ephemeral=hidden)
