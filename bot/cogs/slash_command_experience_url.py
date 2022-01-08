@@ -1,8 +1,10 @@
 import os
+from typing import Union
 from urllib.parse import urlparse
 
 from discord.commands import slash_command, Option
 from discord.ext import commands
+
 from discord.embeds import Embed
 from discord.colour import Colour
 import requests
@@ -11,9 +13,114 @@ from loguru import logger
 from utils.helper import devGuildID, get_random_color
 
 
+def get_playground_id(url: str) -> Union[bool, str]:
+    """
+    Checks if a url is a good portal url
+    :param url:
+    :return: playgroundID if True else False
+    """
+    parsed_url = urlparse(url)
+    valid_url = True
+    # check for valid url
+    # a valid parsed url is like
+    # ParseResult(scheme='https', netloc='portal.battlefield.com', path='/experience/rules', params='',
+    # query='playgroundId=a40094d0-69a3-11ec-a77f-970dc4ce1096', fragment='')
+    if parsed_url.netloc != "portal.battlefield.com":
+        valid_url = False
+    elif parsed_url.query.split("=")[0] != "playgroundId":
+        valid_url = False
+    if not valid_url:
+        return False
+    return parsed_url.query.split("=")[1]
+
+
+def make_embed(playground_id: str) -> Union[Embed, bool]:
+    """
+    Makes Embed from a playground_id
+    :param playground_id: playgroundId of a experience
+    :return: Embed if playground_id is valid, else False
+    """
+    playground_id = playground_id
+    url = f"https://portal.battlefield.com/experience/mode/game-mode?playgroundId={playground_id}"
+    # make gametools API call to get name and desc
+    resp_json = requests.get(
+        url=f"https://api.gametools.network/bf2042/playground/?playgroundid={playground_id}"
+    ).json()
+
+    if "errors" in resp_json.keys():
+        return False
+
+    experience_info = resp_json["validatedPlayground"]
+    embed = Embed(
+        title=experience_info["playgroundName"].capitalize(),
+        description=f"**{experience_info['playgroundDescription']}**",
+        color=get_random_color(),
+        url=url
+    )
+
+    embed.add_field(
+        name="Last Updated",
+        value=f"<t:{experience_info['updatedAt']['seconds']}>",
+    )
+    embed.add_field(
+        name="Created At",
+        value=f"<t:{experience_info['createdAt']['seconds']}>",
+    )
+    embed.add_field(
+        name="\u200B",
+        value="\u200B"
+    )
+
+    embed.add_field(
+        name="Type",
+        value=experience_info["blueprintType"],
+    )
+    embed.add_field(
+        name="Max players",
+        value=f"{experience_info['mapRotation']['maps'][0]['gameSize']}".strip(),
+        inline=True
+    )
+    embed.add_field(
+        name="\u200B",
+        value="\u200B"
+    )
+
+    embed.add_field(
+        name="PlaygroundID",
+        value=experience_info["playgroundId"],
+        inline=False
+    )
+
+    tag_data = resp_json["tag"]
+    tags = [f'`{i["values"][0]["readableSettingName"]}`' for i in tag_data]
+    embed.add_field(
+        name="Tags",
+        value=" ".join(tags)
+    )
+    embed.set_thumbnail(
+        url=f"{experience_info['mapRotation']['maps'][0]['image']}"
+    )
+
+    embed.set_footer(
+        text=f"Experience Made by {experience_info['owner']['name']}",
+        icon_url=experience_info['owner']['avatar']
+    )
+    return embed
+
+
 class ExperienceUrlEmbed(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        playground_id = get_playground_id(message.content)
+        embed = False
+        if playground_id:
+            embed = make_embed(playground_id)
+
+        if embed:
+            await message.channel.send(embeds=[embed])
 
     @slash_command(
         name="experience_info",
@@ -25,19 +132,8 @@ class ExperienceUrlEmbed(commands.Cog):
                              playground_id: Option(str, "PlaygroundID of the experience", required=False)
                              ):
         if url:
-            parsed_url = urlparse(url)
-            valid_url = True
-            # check for valid url
-            # a valid parsed url is like
-            # ParseResult(scheme='https', netloc='portal.battlefield.com', path='/experience/rules', params='',
-            # query='playgroundId=a40094d0-69a3-11ec-a77f-970dc4ce1096', fragment='')
-
-            if parsed_url.netloc != "portal.battlefield.com":
-                valid_url = False
-            elif parsed_url.query.split("=")[0] != "playgroundId":
-                valid_url = False
-
-            if not valid_url:
+            playground_id = get_playground_id(url)
+            if not playground_id:
                 logger.info(f"Invalid URL {{{url}}} sent by {ctx.author}:{ctx.author.id}")
                 await ctx.respond(embeds=[
                     Embed(
@@ -47,18 +143,10 @@ class ExperienceUrlEmbed(commands.Cog):
                     )
                 ], ephemeral=True)
                 return
-            playground_id = parsed_url.query.split("=")[1]
-        else:
-            playground_id = playground_id
-            url = f"https://portal.battlefield.com/experience/mode/game-mode?playgroundId={playground_id}"
-        # make gametools API call to get name and desc
-        resp_json = requests.get(
-            url=f"https://api.gametools.network/bf2042/playground/?playgroundid={playground_id}"
-        ).json()
-
-        if "errors" in resp_json.keys():
+        embed = make_embed(playground_id)
+        if not embed:
             logger.info(
-                f"Invalid URL with wrong playgroundID {{{playground_id}}} "
+                f"Invalid playgroundID {{{playground_id}}} "
                 f"sent by {ctx.author}:{ctx.author.id}"
             )
             await ctx.respond(embeds=[
@@ -69,62 +157,6 @@ class ExperienceUrlEmbed(commands.Cog):
                 )
             ], ephemeral=True)
             return
-
-        experience_info = resp_json["validatedPlayground"]
-        embed = Embed(
-            title=experience_info["playgroundName"].capitalize(),
-            description=f"**{experience_info['playgroundDescription']}**",
-            color=get_random_color(),
-            url=url
-        )
-
-        embed.add_field(
-            name="Last Updated",
-            value=f"<t:{experience_info['updatedAt']['seconds']}>",
-        )
-        embed.add_field(
-            name="Created At",
-            value=f"<t:{experience_info['createdAt']['seconds']}>",
-        )
-        embed.add_field(
-            name="\u200B",
-            value="\u200B"
-        )
-
-        embed.add_field(
-            name="Type",
-            value=experience_info["blueprintType"],
-        )
-        embed.add_field(
-            name="Max players",
-            value=f"{experience_info['mapRotation']['maps'][0]['gameSize']}".strip(),
-            inline=True
-        )
-        embed.add_field(
-            name="\u200B",
-            value="\u200B"
-        )
-
-        embed.add_field(
-            name="PlaygroundID",
-            value=experience_info["playgroundId"],
-            inline=False
-        )
-
-        tag_data = resp_json["tag"]
-        tags = [f'`{i["values"][0]["readableSettingName"]}`' for i in tag_data]
-        embed.add_field(
-            name="Tags",
-            value=" ".join(tags)
-        )
-        embed.set_thumbnail(
-            url=f"{experience_info['mapRotation']['maps'][0]['image']}"
-        )
-
-        embed.set_footer(
-            text=f"Experience Made by {experience_info['owner']['name']}",
-            icon_url=experience_info['owner']['avatar']
-        )
 
         # send the embed :)
         await ctx.respond(embeds=[embed])
