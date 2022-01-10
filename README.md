@@ -1,5 +1,6 @@
 # portal-docs-bot
-[![Deploy to Amazon ECS ](https://github.com/p0lygun/portal_helper/actions/workflows/aws.yml/badge.svg) ](https://github.com/p0lygun/portal_helper/actions/workflows/aws.yml)  
+[![Amazon ECS](https://github.com/p0lygun/portal_helper/actions/workflows/aws.yml/badge.svg)](https://github.com/p0lygun/portal_helper/actions/workflows/aws.yml)  
+  
 This is a bot to display documentation of various blocks in Battlefield 2042's Portal logic builder,  use command `/d`
 
 ## How to run 
