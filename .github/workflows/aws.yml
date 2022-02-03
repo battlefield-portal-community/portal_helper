@@ -27,6 +27,7 @@
 name: Amazon ECS
 
 on:
+  workflow_dispatch:
   push:
     branches:
       release
