@@ -1,11 +1,10 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-1:092513093289:task-definition/PortalHelperTask:1",
+    "taskDefinitionArn": "arn:aws:ecs:ap-south-1:092513093289:task-definition/PortalHelperTask:1",
     "containerDefinitions": [
         {
             "name": "portalhelper",
-            "image": "092513093289.dkr.ecr.us-east-1.amazonaws.com/portal-helper:2de9312b6a3d62b427eb3e5b3f186b4726c5e920",
+            "image": "092513093289.dkr.ecr.ap-south-1.amazonaws.com/portal-helper:c2f6213f7f44910e6266dd2abf39e42c2f89c122",
             "cpu": 0,
-            "links": [],
             "portMappings": [
                 {
                     "containerPort": 80,
@@ -14,8 +13,6 @@
                 }
             ],
             "essential": true,
-            "entryPoint": [],
-            "command": [],
             "environment": [],
             "environmentFiles": [
                 {
@@ -25,13 +22,6 @@
             ],
             "mountPoints": [],
             "volumesFrom": [],
-            "secrets": [],
-            "dnsServers": [],
-            "dnsSearchDomains": [],
-            "extraHosts": [],
-            "dockerSecurityOptions": [],
-            "dockerLabels": {},
-            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
@@ -39,10 +29,8 @@
                     "awslogs-group": "/ecs/PortalHelperTask",
                     "awslogs-region": "us-east-1",
                     "awslogs-stream-prefix": "ecs"
-                },
-                "secretOptions": []
-            },
-            "systemControls": []
+                }
+            }
         }
     ],
     "family": "PortalHelperTask",
@@ -63,9 +51,6 @@
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
         },
         {
             "name": "ecs.capability.env-files.s3"
@@ -97,7 +82,7 @@
     ],
     "cpu": "256",
     "memory": "512",
-    "registeredAt": "2022-01-07T21:03:30.961Z",
+    "registeredAt": "2022-02-03T13:17:23.572Z",
     "registeredBy": "arn:aws:iam::092513093289:user/admin",
     "tags": [
         {

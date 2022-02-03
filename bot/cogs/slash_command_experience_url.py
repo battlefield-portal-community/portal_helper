@@ -44,7 +44,7 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
     url = f"https://portal.battlefield.com/experience/mode/game-mode?playgroundId={playground_id}"
     # make gametools API call to get name and desc
     resp_json = requests.get(
-        url=f"https://api.gametools.network/bf2042/playground/?playgroundid={playground_id}"
+        url=f"https://api.gametools.network/bf2042/playground/?playgroundid={playground_id}&blockydata=false&lang=en-us"
     ).json()
 
     if "errors" in resp_json.keys():

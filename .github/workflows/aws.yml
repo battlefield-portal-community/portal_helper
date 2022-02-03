@@ -24,15 +24,16 @@
 #    See the documentation for each action used below for the recommended IAM policies for this IAM user,
 #    and best practices on handling the access key credentials.
 
-name: Deploy to Amazon ECS
+name: Amazon ECS
 
 on:
+  workflow_dispatch:
   push:
     branches:
       release
 
 env:
-  AWS_REGION: us-east-1                   # set this to your preferred AWS region, e.g. us-west-1
+  AWS_REGION: ap-south-1                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: portal-helper           # set this to your Amazon ECR repository name
   ECS_SERVICE: PortalHelperService                 # set this to your Amazon ECS service name
   ECS_CLUSTER: PortaHelper         # set this to your Amazon ECS cluster name
