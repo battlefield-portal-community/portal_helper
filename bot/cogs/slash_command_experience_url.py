@@ -60,11 +60,11 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
 
     embed.add_field(
         name="Last Updated",
-        value=f"<t:{experience_info['updatedAt']['seconds']}>",
+        value=f"> <t:{experience_info['updatedAt']['seconds']}>",
     )
     embed.add_field(
         name="Created At",
-        value=f"<t:{experience_info['createdAt']['seconds']}>",
+        value=f"> <t:{experience_info['createdAt']['seconds']}>",
     )
     embed.add_field(
         name="\u200B",
@@ -73,11 +73,11 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
 
     embed.add_field(
         name="Type",
-        value=experience_info["blueprintType"],
+        value=f'> {experience_info["blueprintType"]}',
     )
     embed.add_field(
         name="Max players",
-        value=f"{experience_info['mapRotation']['maps'][0]['gameSize']}".strip(),
+        value=f"> {experience_info['mapRotation']['maps'][0]['gameSize']}".strip(),
         inline=True
     )
     embed.add_field(
@@ -87,7 +87,7 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
 
     embed.add_field(
         name="PlaygroundID",
-        value=experience_info["playgroundId"],
+        value=f'> {experience_info["playgroundId"]}',
         inline=False
     )
 
@@ -95,7 +95,7 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
     tags = [f'`{i["values"][0]["readableSettingName"]}`' for i in tag_data]
     embed.add_field(
         name="Tags",
-        value=" ".join(tags)
+        value="> " + " ".join(tags)
     )
     embed.set_thumbnail(
         url=f"{experience_info['mapRotation']['maps'][0]['image']}"
