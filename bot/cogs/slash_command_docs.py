@@ -82,7 +82,7 @@ def make_embed(block_name: str) -> discord.Embed:
     :param block_name: str
     :return: discord.Embed
     """
-    image_url = f"https://portal-helper-block-images.s3.amazonaws.com/blocks_images/{block_name}.png"
+    image_url = f"https://raw.githubusercontent.com/battlefield-portal-community/Image-CDN/main/{block_name}.png"
     block_name = block_name.lower()
     if block_name == "all":
         # todo: Show Complete list of all blocks
