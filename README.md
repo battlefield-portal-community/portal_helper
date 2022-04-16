@@ -1,5 +1,5 @@
 # Portal Helper Bot
-[![Amazon ECS](https://github.com/p0lygun/portal_helper/actions/workflows/aws.yml/badge.svg)](https://github.com/p0lygun/portal_helper/actions/workflows/aws.yml)  
+[![Docker Deployment](https://github.com/battlefield-portal-community/portal_helper/actions/workflows/docker-publish.yml/badge.svg?branch=release)](https://github.com/battlefield-portal-community/portal_helper/actions/workflows/docker-publish.yml)
   
 A discord bot to display various things related to battlefield 2042's Portal Mode
 Commands,  
