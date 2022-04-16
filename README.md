@@ -1,7 +1,12 @@
-# portal-docs-bot
+# Portal Helper Bot
 [![Amazon ECS](https://github.com/p0lygun/portal_helper/actions/workflows/aws.yml/badge.svg)](https://github.com/p0lygun/portal_helper/actions/workflows/aws.yml)  
   
-This is a bot to display documentation of various blocks in Battlefield 2042's Portal logic builder,  use command `/d`
+A discord bot to display various things related to battlefield 2042's Portal Mode
+Commands,  
+
+- `/d` Show documenation of a block with its image
+- `/tools` Shows Various Community made tools for Portal mode
+- `experience info` Show Very helpful info about a experience made in Portal
 
 ## How to run 
 
