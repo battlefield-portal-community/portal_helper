@@ -38,6 +38,11 @@ class ToolsCog(commands.Cog):
             "user_id": 140391046822494208
 
         }, {
+            "name": "2042 Compendium",
+            "value": "A bot with a growing database of information about Weapons, Specialists, Maps, Eastereggs and more!",
+            "url": "https://top.gg/bot/676103413355905045",
+            "user_id": 599688337401577472
+        }, {
             "name": "Battlefield Portal Blocks",
             "value": "A repository of some useful Portal Rule Editor Blocks",
             "url": "https://github.com/Andygmb/Battlefield-Portal-Blocks",
