@@ -71,9 +71,26 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
         value="\u200B"
     )
 
+    xp_type = None
+
+    tag_data = resp_json["tag"]
+    tags = []
+    for i in tag_data:
+        tags.append(f'`{i["values"][0]["readableSettingName"]}`')
+        if i['values'][0]['settingName'] == "ID_ARRIVAL_SERVERTAG_CUSTOM_SCRIPTED":
+            xp_type = "Restricted"
+
+    if xp_type is None:
+        for mutator in experience_info['mutators']:
+            if "WA_XP_Reduced" in mutator['category'].split(','):
+                xp_type = "Moderate"
+
+    if xp_type is None:
+        xp_type = 'Full'
+
     embed.add_field(
-        name="Type",
-        value=f'> {experience_info["blueprintType"]}',
+        name="Progression",
+        value=f'> {xp_type}',
     )
     embed.add_field(
         name="Max players",
@@ -91,8 +108,6 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
         inline=False
     )
 
-    tag_data = resp_json["tag"]
-    tags = [f'`{i["values"][0]["readableSettingName"]}`' for i in tag_data]
     embed.add_field(
         name="Tags",
         value="> " + " ".join(tags)
