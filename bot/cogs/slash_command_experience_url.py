@@ -34,18 +34,23 @@ def get_playground_id(url: str) -> Union[bool, str]:
     return parsed_url.query.split("=")[1]
 
 
-def make_embed(playground_id: str) -> Union[Embed, bool]:
+def make_embed(playground_id: str = None, experience_code: str = None) -> Union[Embed, bool]:
     """
     Makes Embed from a playground_id
     :param playground_id: playgroundId of a experience
+    :param experience_code: Experience Code
     :return: Embed if playground_id is valid, else False
     """
-    playground_id = playground_id
-    url = f"https://portal.battlefield.com/experience/mode/game-mode?playgroundId={playground_id}"
+    if playground_id:
+        url = f"https://portal.battlefield.com/experience/mode/game-mode?playgroundId={playground_id}"
+        request_url = f"https://api.gametools.network/bf2042/playground/?playgroundid={playground_id}&blockydata=false&lang=en-us"
+    elif experience_code:
+        url = f"https://bfportal.gg/"
+        request_url = f"https://api.gametools.network/bf2042/playground/?experiencecode={experience_code.strip()}&blockydata=false&lang=en-us"
     # make gametools API call to get name and desc
-    resp_json = requests.get(
-        url=f"https://api.gametools.network/bf2042/playground/?playgroundid={playground_id}&blockydata=false&lang=en-us"
-    ).json()
+
+    logger.debug(request_url)
+    resp_json = requests.get(url = request_url).json()
 
     if "errors" in resp_json.keys():
         return False
@@ -102,11 +107,18 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
         value="\u200B"
     )
 
-    embed.add_field(
-        name="PlaygroundID",
-        value=f'> {experience_info["playgroundId"]}',
-        inline=False
-    )
+    if playground_id:
+        embed.add_field(
+            name="PlaygroundID",
+            value=f'> {experience_info["playgroundId"]}',
+            inline=False
+        )
+    elif experience_code:
+        embed.add_field(
+            name="Number of Maps",
+            value=f'> {len(experience_info["mapRotation"]["maps"])}',
+            inline=False
+        )
 
     embed.add_field(
         name="Tags",
@@ -116,10 +128,11 @@ def make_embed(playground_id: str) -> Union[Embed, bool]:
         url=f"{experience_info['mapRotation']['maps'][0]['image']}"
     )
 
-    embed.set_footer(
-        text=f"Experience Made by {experience_info['owner']['name']}",
-        icon_url=experience_info['owner']['avatar']
-    )
+    if playground_id:
+        embed.set_footer(
+            text=f"Experience Made by {experience_info['owner']['name']}",
+            icon_url=experience_info['owner']['avatar']
+        )
     return embed
 
 
@@ -144,8 +157,10 @@ class ExperienceUrlEmbed(commands.Cog):
     )
     async def make_url_embed(self, ctx,
                              url: Option(str, "Url of the experience", required=False),
-                             playground_id: Option(str, "PlaygroundID of the experience", required=False)
+                             playground_id: Option(str, "PlaygroundID of the experience", required=False),
+                             experience_code: Option(str, "Experience Code", required=False)
                              ):
+        logger.debug(f"ExperienceUrlEmbed {url} {playground_id} {experience_code}")
         if url:
             playground_id = get_playground_id(url)
             if not playground_id:
@@ -158,7 +173,11 @@ class ExperienceUrlEmbed(commands.Cog):
                     )
                 ], ephemeral=True)
                 return
-        embed = make_embed(playground_id)
+        if playground_id:
+            embed = make_embed(playground_id, None)
+        elif experience_code:
+            embed = make_embed(None, experience_code)
+
         if not embed:
             logger.info(
                 f"Invalid playgroundID {{{playground_id}}} "
