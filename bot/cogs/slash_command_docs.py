@@ -140,7 +140,7 @@ class DocumentationCog(commands.Cog):
                 )], ephemeral=hidden,
             )
         except BaseException as e:
-            logger.warning(f"Error {e} with {block_name} {get_closest_match(block_name)}")
+            logger.warning(f"Error {e} with {block_name} {get_autocomplete_blocks(block_name, closest_match=True)}")
             await ctx.respond(
                 embeds=[Embed(
                     title=f"Error getting docs for {block_name}",
