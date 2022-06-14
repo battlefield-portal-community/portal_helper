@@ -51,29 +51,19 @@ def make_bold(text):
     return content_final
 
 
-def get_autocomplete_blocks(ctx: discord.AutocompleteContext) -> list:
+def get_autocomplete_blocks(ctx: discord.AutocompleteContext | str, closest_match: bool = False) -> list | str:
     """
-    Returns a list of 25 elements, sorted by highest fuzz.ratio
+    Returns a list of 25 elements, sorted by highest fuzz.ratio.
 
-    :param ctx:
-    :return:
+    :param ctx: block name
+    :param closest_match: only Returns the closest match
+    :return: list
     """
-    ratio_list = [(i, fuzz.ratio(ctx.value.lower(), i)) for i in dh.docs_dict.keys()]
-    ratio_list.sort(key=lambda x: x[1], reverse=True)
-    autocomplete_list = [dh.docs_dict[i[0]][-1] for i in ratio_list[0:25]]
-    # autocomplete_list = [value[-1] for key, value in dh.docs_dict.items() if key.startswith(ctx.value.lower())][0:25]
-    return autocomplete_list
-
-
-def get_closest_match(block: str) -> list:
-    """
-    same as get_autocomplete_blocks but for internal use
-    :param block: str, block name
-    :return:
-    """
-    ratio_list = [(i, fuzz.ratio(block, i)) for i in dh.docs_dict.keys()]
-    ratio_list.sort(key=lambda x: x[1], reverse=True)
-    return ratio_list[0][0]
+    ratio_list = [(i, fuzz.partial_ratio((ctx if closest_match else ctx.value), i)) for i in dh.docs_dict.keys()]
+    blocks = [i[0] for i in sorted(ratio_list, key=lambda x: x[1], reverse=True)][0:(1 if closest_match else 25)]
+    if closest_match:
+        return blocks[0]
+    return blocks
 
 
 def make_embed(block_name: str) -> discord.Embed:
@@ -83,7 +73,6 @@ def make_embed(block_name: str) -> discord.Embed:
     :return: discord.Embed
     """
     image_url = f"https://raw.githubusercontent.com/battlefield-portal-community/Image-CDN/main/{block_name}.png"
-    block_name = block_name.lower()
     if block_name == "all":
         # todo: Show Complete list of all blocks
         raise NotImplementedError("command to get all blocks not implemented yet")
@@ -93,62 +82,28 @@ def make_embed(block_name: str) -> discord.Embed:
     elif block_name in dh.docs_dict.keys():
         doc = dh.get_doc(str(block_name))
     else:
-        closet_match = get_closest_match(block_name)
+        closet_match = get_autocomplete_blocks(block_name, closest_match=True)
         if closet_match != "rule":
             doc = dh.get_doc(closet_match)
         else:
             return special_embeds("rule")
-    doc_list = [i for i in doc.split("\n") if i != ""]
-    output = ''
-    inputs = ''
-    title = doc_list[0]
-    if "Inputs" in doc_list:
-        content = doc_list[1:doc_list.index("Inputs")][0]
-    else:
-        content = doc_list[1:][0]
-    if "Output" in doc_list:
-        if "Inputs" in doc_list:
-            inputs = doc_list[doc_list.index("Inputs") + 1:doc_list.index("Output")]
-        output = doc_list[doc_list.index("Output") + 1:]
-    else:
-        if "Inputs" in doc_list:
-            inputs = doc_list[doc_list.index("Inputs") + 1:]
 
-    inputs = " ".join(inputs)
-    output = " ".join(output)
-    content = make_bold(content)
-    notes = ''
-    if "Notes" in inputs:
-        tmp = inputs.split("Notes")
-        notes = tmp[1]
-        inputs = tmp[0]
-    if "Notes" in output:
-        tmp = output.split("Notes")
-        notes = tmp[1]
-        output = tmp[0]
-    url = title.replace(" ", "")
     embed_fields = []
-    if inputs:
+    if 'inputs' in doc.keys():
         embed_fields.append({
             "name": "Inputs",
-            "value": inputs,
+            "value": "\n".join(doc['inputs']),
             "inline": False
         })
-    if output:
+    if 'output' in doc.keys():
         embed_fields.append({
             "name": "Output",
-            "value": output
-        })
-    if notes:
-        embed_fields.append({
-            "name": "Notes",
-            "value": notes,
-            "inline": False
+            "value": "\n".join(doc['output'])
         })
     embed = Embed(
-        title=title,
-        url=f"https://docs.bfportal.gg/docs/blocks/{url}",
-        description=content,
+        title=doc['block'],
+        url=f"https://docs.bfportal.gg/docs/blocks/{doc['block']}",
+        description=doc['summary'],
         color=random.choice(COLORS),
     )
     for field in embed_fields:
@@ -185,7 +140,7 @@ class DocumentationCog(commands.Cog):
                 )], ephemeral=hidden,
             )
         except BaseException as e:
-            logger.warning(f"Error {e} with {block_name} {get_closest_match(block_name)}")
+            logger.warning(f"Error {e} with {block_name} {get_autocomplete_blocks(block_name, closest_match=True)}")
             await ctx.respond(
                 embeds=[Embed(
                     title=f"Error getting docs for {block_name}",
