@@ -72,7 +72,8 @@ def make_embed(block_name: str) -> discord.Embed:
     :param block_name: str
     :return: discord.Embed
     """
-    image_url = f"https://raw.githubusercontent.com/battlefield-portal-community/Image-CDN/main/{block_name}.png"
+    img = 'Rule' if block_name.lower() == 'rule' else block_name
+    image_url = f"https://raw.githubusercontent.com/battlefield-portal-community/Image-CDN/main/portal_blocks/{img}.png"
     if block_name == "all":
         # todo: Show Complete list of all blocks
         raise NotImplementedError("command to get all blocks not implemented yet")
