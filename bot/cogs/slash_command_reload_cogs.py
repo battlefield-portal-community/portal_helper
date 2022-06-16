@@ -80,14 +80,15 @@ class ReloadCogs(commands.Cog):
     @slash_command(name="reload_github", guild_ids=[devGuildID], default_permission=False)
     @permissions.is_owner()
     async def reload(self, ctx):
-        if ctx.author.user.id == "338947895665360898":
+        logger.debug(f"trying to update github data command called by {ctx.author.id}")
+        if ctx.author.id == 338947895665360898:
             try:
                 from utils.github_api import DataHandler
                 dh = DataHandler(update=False)
                 dh.update_data()
                 await ctx.send(
                     embeds=[Embed(
-                        title="Successfully Updated sha-mapping",
+                        title="Successfully Updated Github data",
                         description="\u200b",
                         colour=int("00ff00", 16)
                     )]
@@ -101,7 +102,14 @@ class ReloadCogs(commands.Cog):
                         colour=int("ff0000", 16)
                     )]
                 )
-
+        else:
+            await ctx.send(
+                embeds=[Embed(
+                    title="You dont have permissions to update GitHub data",
+                    description="\u200b",
+                    colour=int("ff0000", 16)
+                )]
+            )
 
 def setup(bot):
     bot.add_cog(ReloadCogs(bot))
