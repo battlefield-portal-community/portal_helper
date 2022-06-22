@@ -98,9 +98,12 @@ def make_embed(playground_id: str = None, experience_code: str = None) -> Union[
         name="Progression",
         value=f'> {xp_type}',
     )
+    team_composition = experience_info.get('teamComposition', '')
+    if team_composition:
+        team_composition = f"({'v'.join([str(team['capacity']) for team in team_composition['teams']])})"
     embed.add_field(
         name="Max players",
-        value=f"> {experience_info['mapRotation']['maps'][0]['gameSize']}".strip(),
+        value=f"> {experience_info['mapRotation']['maps'][0]['gameSize']} {team_composition}".strip(),
         inline=True
     )
     embed.add_field(
