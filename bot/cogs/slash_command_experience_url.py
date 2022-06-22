@@ -81,8 +81,9 @@ def make_embed(playground_id: str = None, experience_code: str = None) -> Union[
     tag_data = resp_json["tag"]
     tags = []
     for i in tag_data:
-        tags.append(f'`{i["values"][0]["readableSettingName"]}`')
-        if i['values'][0]['settingName'] == "ID_ARRIVAL_SERVERTAG_CUSTOM_SCRIPTED":
+        tag_info = i["metadata"]["translations"][0]
+        tags.append(f'`{tag_info["localizedText"]}`')
+        if tag_info['translationId'] == "ID_ARRIVAL_SERVERTAG_CUSTOM_SCRIPTED":
             xp_type = "Restricted"
 
     if xp_type is None:
