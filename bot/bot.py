@@ -2,6 +2,7 @@ import os
 
 from loguru import logger
 from discord.ext.commands import Bot
+import discordhealthcheck
 
 from utils.github_api import DataHandler
 from utils.helper import project_base_path
@@ -10,6 +11,7 @@ from utils.helper import project_base_path
 class PortalDocsBot(Bot):
     def __init__(self, command_prefix, **options):
         super().__init__(command_prefix, **options)
+        #self.healthcheck_server = discordhealthcheck.start(self)
         self.token = os.getenv("PD_DISCORD_TOKEN")
         self.dh = DataHandler(False if os.getenv("PD_DEVELOPMENT") else True)
         self.colors = ["011C26", "025159", "08A696", "26FFDF", "F26A1B", "FF2C10"]

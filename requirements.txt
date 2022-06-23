@@ -6,7 +6,6 @@ certifi==2021.10.8
 chardet==4.0.0
 charset-normalizer==2.0.9
 colorama==0.4.4
-discord.py==1.7.3
 discordhealthcheck==0.0.8
 idna==3.3
 importlib-metadata==4.9.0
