@@ -172,10 +172,18 @@ class ExperienceUrlEmbed(commands.Cog):
         description="Shows info about portal experiences"
     )
     async def make_url_embed(self, ctx,
-                             url: Option(str, "Url of the experience", required=False),
-                             playground_id: Option(str, "PlaygroundID of the experience", required=False),
-                             experience_code: Option(str, "Experience Code", required=False)
+                             input_type: Option(str, "Choose the input type", choices=["Url", "Playground ID", "Experience Code"]),
+                             value: Option(str, "Input Value")
                              ):
+        url, playground_id, experience_code = None, None, None
+        match input_type.lower():
+            case "url":
+                url = value
+            case "playground id":
+                playground_id = value
+            case "experience code":
+                experience_code = value
+
         logger.debug(f"ExperienceUrlEmbed {url} {playground_id} {experience_code}")
         if url:
             playground_id = get_playground_id(url)
