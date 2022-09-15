@@ -71,10 +71,22 @@ def make_embed(playground_id: str = None, experience_code: str = None) -> Union[
         name="Created At",
         value=f"> <t:{experience_info['createdAt']['seconds']}>",
     )
-    embed.add_field(
-        name="\u200B",
-        value="\u200B"
-    )
+
+    if experience_code:
+        embed.add_field(
+            name="Experience Code",
+            value=f"> **{experience_code}**"
+        )
+    elif playground_id:
+        embed.add_field(
+            name="Experience URL",
+            value=f"> [Open 🔗](https://portal.battlefield.com/experience/rules?playgroundId={playground_id})"
+        )
+    else:
+        embed.add_field(
+            name="\u200B",
+            value="\u200B"
+        )
 
     xp_type = None
 
