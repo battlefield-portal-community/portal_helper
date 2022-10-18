@@ -197,6 +197,7 @@ class ExperienceUrlEmbed(commands.Cog):
                     )
                 ], ephemeral=True)
                 return
+        embed = False
         if playground_id:
             embed = make_embed(playground_id, None)
         elif experience_code:
