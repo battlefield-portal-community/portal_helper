@@ -1,8 +1,7 @@
 import os
 
-from loguru import logger
 from discord.ext.commands import Bot
-import discordhealthcheck
+from loguru import logger
 
 from utils.github_api import DataHandler
 from utils.helper import project_base_path

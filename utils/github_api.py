@@ -1,14 +1,10 @@
+import json
+import re
+from pathlib import Path
 from typing import TypedDict, Optional
 
-from requests import get
-import json
-import base64
-from pathlib import Path
-from markdown import markdown
-from bs4 import BeautifulSoup
 from loguru import logger
-from rapidfuzz import fuzz
-import discord
+from requests import get
 
 
 class CleanDoc(TypedDict):
@@ -22,6 +18,7 @@ class DataHandler:
     def __init__(self, update: bool = True):
         self.github_endpoint = r"https://api.github.com/repos/battlefield-portal-community/portal-docs/contents/docs"
         self.local_file_path = Path(__file__).parents[1] / "data/blocks_info"
+        self.cache = dict()
         Path(self.local_file_path).parent.mkdir(exist_ok=True)
         Path(self.local_file_path).touch(exist_ok=True)
         self.docs_dict = dict()
@@ -38,6 +35,7 @@ class DataHandler:
 
         with open(self.local_file_path, 'w') as FILE:
             json.dump(self.docs_dict, FILE)
+        self.cache.clear()
         logger.debug("Updating GitHub Complete")
 
     def load_data(self):
@@ -56,15 +54,21 @@ class DataHandler:
         if target not in self.docs_dict.keys():
             raise ValueError("Specified Block not found")
 
-        url = self.docs_dict[target]
-        data = get(url)
-        if data.status_code != 200:
-            raise ValueError(f"Unable to get {target} from github, api url {url}")
-        return json.loads(data.text)
+        if target not in self.cache.keys():
+            logger.debug(f"cache miss:- {target}")
+            url = self.docs_dict[target]
+            data = get(url)
+            if data.status_code != 200:
+                raise ValueError(f"Unable to get {target} from github, api url {url}")
+            self.cache[target] = json.loads(data.text)
+
+        return self.cache[target]
 
 
 if __name__ == "__main__":
     dh = DataHandler(update=False)
     dh.load_data()
-    #dh.update_data()
-    print(get_autocomplete_blocks("Deploy"))
+    doc = dh.get_doc("Rule")['summary'][220:]
+    f = list(re.finditer(r"^\*\*.*\*\*$", doc, flags=re.MULTILINE))
+    for index, match in enumerate(f):
+        print(index, match.group())

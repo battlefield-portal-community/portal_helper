@@ -2,12 +2,11 @@ import os
 from typing import Union
 from urllib.parse import urlparse
 
-from discord.commands import slash_command, Option
-from discord.ext import commands
-
-from discord.embeds import Embed
-from discord.colour import Colour
 import requests
+from discord.colour import Colour
+from discord.commands import slash_command, Option
+from discord.embeds import Embed
+from discord.ext import commands
 from loguru import logger
 
 from utils.helper import devGuildID, get_random_color
@@ -15,7 +14,7 @@ from utils.helper import devGuildID, get_random_color
 
 def get_playground_id(url: str) -> Union[bool, str]:
     """
-    Checks if a url is a good portal url
+    Checks if an url is a good portal url
     :param url:
     :return: playgroundID if True else False
     """
@@ -197,6 +196,7 @@ class ExperienceUrlEmbed(commands.Cog):
                     )
                 ], ephemeral=True)
                 return
+        embed = False
         if playground_id:
             embed = make_embed(playground_id, None)
         elif experience_code:
