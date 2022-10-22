@@ -1,15 +1,10 @@
+import json
+import re
+from pathlib import Path
 from typing import TypedDict, Optional
 
-from requests import get
-import json
-import base64
-from pathlib import Path
-from markdown import markdown
-from bs4 import BeautifulSoup
 from loguru import logger
-from rapidfuzz import fuzz
-import discord
-import re
+from requests import get
 
 
 class CleanDoc(TypedDict):
@@ -73,7 +68,7 @@ class DataHandler:
 if __name__ == "__main__":
     dh = DataHandler(update=False)
     dh.load_data()
-    doc = dh.get_doc("RULE")['summary'][220:]
+    doc = dh.get_doc("Rule")['summary'][220:]
     f = list(re.finditer(r"^\*\*.*\*\*$", doc, flags=re.MULTILINE))
     for index, match in enumerate(f):
-        print(index, match.start())
+        print(index, match.group())

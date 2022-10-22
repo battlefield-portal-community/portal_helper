@@ -2,37 +2,88 @@ import os
 import random
 
 import discord
-from rapidfuzz import fuzz
 from discord.commands import slash_command, Option
-from discord.ext import commands
 from discord.embeds import Embed
+from discord.ext import commands, pages
 from loguru import logger
-
+from rapidfuzz import fuzz
+import re
+from utils.github_api import DataHandler, CleanDoc
 from utils.helper import devGuildID, COLORS
-from utils.github_api import DataHandler
 
 dh = DataHandler()
 dh.load_data()
 
 
-def special_embeds(block_name):
-    if block_name == "rule":
-        clean_doc = dh.get_doc("RULE")
-        # 186 is the index of Ongoing which is the first event.
-        slice_index = 184
-        embed = Embed(
-            title=clean_doc['block'],
-            url=f"https://docs.bfportal.gg/docs/blocks/Rule",
-            description=clean_doc['summary'][0:slice_index],
-            color=random.choice(COLORS),
-        )
-        embed.set_image(
+class RuleBlockPages:
+
+    def __init__(self, clean_doc: CleanDoc):
+
+        self.event_groups = ["Rule", "OnGoing", "OnPlayer", "OnCapture", "OnMCOM", "OnGameMode", "OnVehicle"]
+        self.options = {"Description": ''}
+        summary = clean_doc['summary'][220:]
+        re_groups = list(re.finditer(r"^\*\*.*\*\*$", summary, flags=re.MULTILINE))
+        re_groups_len = len(re_groups)
+        for index, event in enumerate(re_groups):
+            if index != re_groups_len - 1:
+                desc = summary[event.end():re_groups[index + 1].start() - 1]
+            else:
+                desc = summary[event.end():]
+            self.options[event.group().replace("*", '')] = desc
+
+        self.pages = [
+            Embed(
+                title="Rule",
+                description=clean_doc['summary'][0:184]
+            ),
+            Embed(
+                title="OnGoing Events",
+                description=self.options['Ongoing']
+            ),
+
+        ]
+        self.pages[0].set_image(
             url="https://raw.githubusercontent.com/battlefield-portal-community/Image-CDN/main/portal_blocks/Rule.png"
         )
-        return embed
 
-    if block_name == "all":
-        pass
+        for event in self.event_groups[2:]:
+            embed = Embed(
+                title=f"{event.replace('On','', 1)} Events"
+            )
+            [
+                embed.add_field(
+                    name=local_event,
+                    value=value,
+                    inline=False
+                ) for local_event, value in self.options.items() if local_event.startswith(event)
+            ]
+            if event == "OnPlayer":
+                for _ in ["OnMandown", "OnRevived"]:
+                    embed.add_field(
+                        name=_,
+                        value=self.options[_],
+                        inline=False
+                    )
+            self.pages.append(embed)
+
+
+async def rule_block_pagination(ctx: discord.ApplicationContext):
+    rule_block_pages = RuleBlockPages(dh.get_doc("Rule"))
+    page_groups = [
+        pages.PageGroup(
+            pages=[page],
+            label=f"{option} Events",
+        ) for option, page in zip(rule_block_pages.event_groups, rule_block_pages.pages)
+    ]
+    paginator = pages.Paginator(
+        pages=page_groups,
+        show_menu=True,
+        menu_placeholder="Choose Event Type",
+        show_disabled=False,
+        show_indicator=False,
+        timeout=None,
+    )
+    await paginator.respond(ctx.interaction, ephemeral=False)
 
 
 def make_bold(text):
@@ -71,8 +122,6 @@ def make_embed(block_name: str) -> discord.Embed:
         # todo: Show Complete list of all blocks
         raise NotImplementedError("command to get all blocks not implemented yet")
         # return special_embeds("all")
-    elif block_name.lower() == "rule":
-        return special_embeds("rule")
     elif block_name in dh.docs_dict.keys():
         doc = dh.get_doc(str(block_name))
     else:
@@ -80,7 +129,7 @@ def make_embed(block_name: str) -> discord.Embed:
         if closet_match != "rule":
             doc = dh.get_doc(closet_match)
         else:
-            return special_embeds("rule")
+            raise ValueError(f"Unknown Block {block_name}")
 
     embed_fields = []
     if 'inputs' in doc.keys():
@@ -122,8 +171,13 @@ class DocumentationCog(commands.Cog):
                    hidden: Option(bool, "If this is set to true only you can see the output", required=False)
                    ):
         try:
-            embed = make_embed(block_name)
-            await ctx.respond(embeds=[embed], ephemeral=hidden)
+            if block_name.lower() != "rule":
+                await ctx.respond(
+                    embeds=[make_embed(block_name)],
+                    ephemeral=hidden
+                )
+            else:
+                await rule_block_pagination(ctx)
         except NotImplementedError as e:
             logger.warning(e)
             await ctx.respond(
