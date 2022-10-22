@@ -17,24 +17,18 @@ dh.load_data()
 
 def special_embeds(block_name):
     if block_name == "rule":
-        doc_list = [i for i in dh.get_doc("rule").split("\n") if i != ""]
-
-        fields_list = []
-        for i in range(4, len(doc_list) - 1, 2):
-            fields_list.append({
-                "name": doc_list[i],
-                "value": doc_list[i + 1],
-                "inline": False
-            })
-
+        clean_doc = dh.get_doc("RULE")
+        # 186 is the index of Ongoing which is the first event.
+        slice_index = 184
         embed = Embed(
-            title=make_bold(doc_list[0]),
-            url=f"https://docs.bfportal.gg/docs/blocks/{doc_list[0]}",
-            description=doc_list[1] + f"\n**{doc_list[3]}**",
+            title=clean_doc['block'],
+            url=f"https://docs.bfportal.gg/docs/blocks/Rule",
+            description=clean_doc['summary'][0:slice_index],
             color=random.choice(COLORS),
         )
-        for field in fields_list:
-            embed.add_field(**field)
+        embed.set_image(
+            url="https://raw.githubusercontent.com/battlefield-portal-community/Image-CDN/main/portal_blocks/Rule.png"
+        )
         return embed
 
     if block_name == "all":
@@ -68,17 +62,16 @@ def get_autocomplete_blocks(ctx: discord.AutocompleteContext | str, closest_matc
 
 def make_embed(block_name: str) -> discord.Embed:
     """
-    Parses data returned by Github Api and returns an embed
+    Parses data returned by GitHub Api and returns an embed
     :param block_name: str
     :return: discord.Embed
     """
-    img = 'Rule' if block_name.lower() == 'rule' else block_name
-    image_url = f"https://raw.githubusercontent.com/battlefield-portal-community/Image-CDN/main/portal_blocks/{img}.png"
+    image_url = f"https://raw.githubusercontent.com/battlefield-portal-community/Image-CDN/main/portal_blocks/{block_name}.png"
     if block_name == "all":
         # todo: Show Complete list of all blocks
         raise NotImplementedError("command to get all blocks not implemented yet")
         # return special_embeds("all")
-    elif block_name == "rule":
+    elif block_name.lower() == "rule":
         return special_embeds("rule")
     elif block_name in dh.docs_dict.keys():
         doc = dh.get_doc(str(block_name))
