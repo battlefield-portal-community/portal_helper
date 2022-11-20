@@ -16,7 +16,7 @@ class CleanDoc(TypedDict):
 
 class DataHandler:
     def __init__(self, update: bool = True):
-        self.github_endpoint = r"https://api.github.com/repos/battlefield-portal-community/portal-docs/contents/docs"
+        self.github_endpoint = r"https://api.github.com/repos/battlefield-portal-community/portal-docs/contents/docs_json"
         self.local_file_path = Path(__file__).parents[1] / "data/blocks_info"
         self.cache = dict()
         Path(self.local_file_path).parent.mkdir(exist_ok=True)
