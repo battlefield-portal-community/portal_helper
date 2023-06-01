@@ -46,17 +46,19 @@ def make_embed(playground_id: str = None, experience_code: str = None) -> Union[
     elif experience_code:
         url = f"https://bfportal.gg/"
         request_url = f"https://api.gametools.network/bf2042/playground/?experiencecode={experience_code.strip()}&blockydata=false&lang=en-us"
+    else:
+        return False
     # make gametools API call to get name and desc
 
     logger.debug(request_url)
-    resp_json = requests.get(url = request_url).json()
+    resp_json = requests.get(url=request_url).json()
 
     if "errors" in resp_json.keys():
         return False
 
     experience_info = resp_json["validatedPlayground"]
     is_validated = True
-    if not experience_info: # if validatedPlayground is empty, try originalPlayground, cuz `AAB` fucked the bot :)
+    if not experience_info:  # if validatedPlayground is empty, try originalPlayground, cuz `AAB` fucked the bot :)
         experience_info = resp_json["originalPlayground"]
         is_validated = False
 
@@ -191,7 +193,8 @@ class ExperienceUrlEmbed(commands.Cog):
         description="Shows info about portal experiences"
     )
     async def make_url_embed(self, ctx,
-                             input_type: Option(str, "Choose the input type", choices=["Url", "Playground ID", "Experience Code"]),
+                             input_type: Option(str, "Choose the input type",
+                                                choices=["Url", "Playground ID", "Experience Code"]),
                              value: Option(str, "Input Value")
                              ):
         url, playground_id, experience_code = None, None, None
@@ -217,6 +220,7 @@ class ExperienceUrlEmbed(commands.Cog):
                 ], ephemeral=True)
                 return
         embed = False
+        ephemeral = False
         if playground_id:
             embed = make_embed(playground_id, None)
         elif experience_code:
@@ -224,20 +228,17 @@ class ExperienceUrlEmbed(commands.Cog):
 
         if not embed:
             logger.info(
-                f"Invalid playgroundID {{{playground_id}}} "
+                f"Invalid playgroundID {playground_id}"
                 f"sent by {ctx.author}:{ctx.author.id}"
             )
-            await ctx.respond(embeds=[
-                Embed(
-                    title="Invalid PlaygroundID",
-                    description="\u200b",
-                    color=Colour.red()
-                )
-            ], ephemeral=True)
-            return
-
+            embed = Embed(
+                title="Invalid PlaygroundID",
+                description="\u200b",
+                color=Colour.red()
+            )
+            ephemeral = True
         # send the embed :)
-        await ctx.respond(embeds=[embed])
+        await ctx.respond(embeds=[embed], ephemeral=ephemeral)
 
 
 def setup(bot):
