@@ -55,6 +55,17 @@ def make_embed(playground_id: str = None, experience_code: str = None) -> Union[
         return False
 
     experience_info = resp_json["validatedPlayground"]
+    is_validated = True
+    if not experience_info: # if validatedPlayground is empty, try originalPlayground, cuz `AAB` fucked the bot :)
+        experience_info = resp_json["originalPlayground"]
+        is_validated = False
+
+    if not experience_info:
+        return Embed(
+            title="Bot was unable to handel the request",
+            description="pls contact <@338947895665360898> :x",
+            colour=Colour.red()
+        )
     embed = Embed(
         title=experience_info["playgroundName"].capitalize(),
         description=f"**{experience_info['playgroundDescription']}**",
@@ -137,8 +148,17 @@ def make_embed(playground_id: str = None, experience_code: str = None) -> Union[
 
     embed.add_field(
         name="Tags",
-        value="> " + " ".join(tags)
+        value="> " + " ".join(tags),
+        inline=False
+
     )
+    if not is_validated:
+        embed.add_field(
+            name="Validation Error",
+            value="This experience is not validated, will not be able to play in official servers",
+        )
+        embed.colour = Colour.red()
+
     embed.set_thumbnail(
         url=f"{experience_info['mapRotation']['maps'][0]['image']}"
     )
