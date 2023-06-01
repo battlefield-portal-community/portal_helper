@@ -18,7 +18,7 @@ if __name__ == "__main__":
     logger.info("Starting Bot ...")
     try:
         from .bot import PortalDocsBot
-        bot = PortalDocsBot(command_prefix="}")
+        bot = PortalDocsBot(command_prefix="}", guilds=[829265067073339403, 870246147455877181])
         bot.load_custom_cogs()
         bot.run(bot.token)
     except ConnectionError as e:
